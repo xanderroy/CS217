@@ -48,5 +48,3 @@ sonarqube-scan:
       echo -e "\e[91mSONAR ANALYSIS FAILED\e[0m";
       exit 1 #breaks the build for failure in Step2
     fi
-  only:
-  - master
