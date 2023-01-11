@@ -27,6 +27,7 @@ public class App extends Jooby {
         For example in the dice template (dice.hbs) it references "assets/dice.png" which is in resources/assets folder
          */
         assets("/assets/*", "/assets");
+        assets("/service_worker.js","/service_worker.js");
 
         /*
         Now we set up our controllers and their dependencies
@@ -61,7 +62,7 @@ public class App extends Jooby {
         try (Connection connection = ds.getConnection()) {
             //
             Statement stmt = connection.createStatement();
-            stmt.executeUpdate("CREATE TABLE Example (Key varchar(255),Value varchar(255))");
+            stmt.executeUpdate("CREATE TABLE `Example` (`Key` varchar(255),`Value` varchar(255))");
             stmt.executeUpdate("INSERT INTO Example " + "VALUES ('WelcomeMessage', 'Welcome to A Bank')");
         } catch (SQLException e) {
             log.error("Database Creation Error",e);

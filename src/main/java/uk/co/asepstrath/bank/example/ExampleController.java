@@ -65,7 +65,7 @@ public class ExampleController {
             // Create Statement (batch of SQL Commands)
             Statement statement = connection.createStatement();
             // Perform SQL Query
-            ResultSet set = statement.executeQuery("SELECT * FROM Example Where Key = '"+welcomeMessageKey+"'");
+            ResultSet set = statement.executeQuery("SELECT * FROM `Example` Where `Key` = '"+welcomeMessageKey+"'");
             // Read First Result
             set.next();
             // Extract value from Result
