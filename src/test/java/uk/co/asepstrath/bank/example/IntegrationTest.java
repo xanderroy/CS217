@@ -1,7 +1,7 @@
 package uk.co.asepstrath.bank.example;
 
+import io.jooby.test.JoobyTest;
 import uk.co.asepstrath.bank.App;
-import io.jooby.JoobyTest;
 import io.jooby.StatusCode;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
