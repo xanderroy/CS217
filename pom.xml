@@ -5,11 +5,11 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>asep-bank</artifactId>
+    <artifactId>scotbank</artifactId>
     <groupId>uk.co.asepstrath</groupId>
     <version>1.0.0</version>
 
-    <name>asep-bank</name>
+    <name>scotbank</name>
 
     <properties>
         <!-- Startup class -->
@@ -159,7 +159,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.5</version>
+                        <version>0.8.11</version>
                         <executions>
                             <execution>
                                 <id>prepare-agent</id>
