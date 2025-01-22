@@ -15,10 +15,10 @@
         <!-- Startup class -->
         <application.class>uk.co.asepstrath.bank.App</application.class>
 
-        <jooby.version>3.0.7</jooby.version>
+        <jooby.version>3.6.0</jooby.version>
 
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -27,6 +27,11 @@
         <dependency>
             <groupId>io.jooby</groupId>
             <artifactId>jooby-netty</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>1.3.5</version>
         </dependency>
 
         <dependency>
@@ -87,15 +92,25 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.13.0</version>
                 <configuration>
                     <annotationProcessorPaths>
+                        <!-- if using lombok, it must be placed before the jooby-apt -->
+                        <!-- if using avaje-inject, it must be placed after lombok, but before the jooby-apt -->
                         <path>
                             <groupId>io.jooby</groupId>
                             <artifactId>jooby-apt</artifactId>
                             <version>${jooby.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                        <compilerArg>
+                            -Ajooby.debug=false
+                        </compilerArg>
+                        <compilerArg>
+                            -Ajooby.services=true
+                        </compilerArg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -159,7 +174,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.11</version>
+                        <version>0.8.12</version>
                         <executions>
                             <execution>
                                 <id>prepare-agent</id>

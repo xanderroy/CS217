@@ -1,11 +1,13 @@
 package uk.co.asepstrath.bank;
 
+import io.jooby.netty.NettyServer;
 import uk.co.asepstrath.bank.example.ExampleController;
 import io.jooby.Jooby;
 import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.example.ExampleController_;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -18,6 +20,7 @@ public class App extends Jooby {
         /*
         This section is used for setting up the Jooby Framework modules
          */
+        install(new NettyServer());
         install(new UniRestExtension());
         install(new HandlebarsModule());
         install(new HikariModule("mem"));
@@ -35,7 +38,7 @@ public class App extends Jooby {
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
 
-        mvc(new ExampleController(ds,log));
+        mvc(new ExampleController_(ds,log));
 
         /*
         Finally we register our application lifecycle methods
