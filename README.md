@@ -10,4 +10,5 @@ Welcome to your-bank!!
 
     ./mvnw.cmd clean package
 
-i am testing git rights (xander roy)
+
+i am testing git rights (xander roy). It was I dio (Haroon Wahid). SANDY SUCCESS.  holy gitmoli (Holly Higgins)
