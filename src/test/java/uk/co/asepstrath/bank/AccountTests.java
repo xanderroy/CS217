@@ -54,4 +54,14 @@ public class AccountTests {
         Assertions.assertTrue(a.getBalance()==10);
     }
 
+    @Test
+    public void penniesTest() {
+        Account a = new Account();
+        a.deposit(5.45);
+        a.deposit(17.56);
+        System.out.println(a.getBalance());
+        Assertions.assertTrue(a.getBalance()==23.01);
+
+    }
+
 }
