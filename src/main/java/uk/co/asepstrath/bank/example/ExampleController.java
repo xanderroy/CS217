@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -47,7 +48,7 @@ public class ExampleController {
 
     /*
     This @Get annotation takes an optional path parameter which denotes the function should be invoked on GET <host>/example/hello
-    Note that this function makes it's own request to another API (http://faker.hook.io/) and returns the response
+    Note that this function makes its own request to another API (http://faker.hook.io/) and returns the response
      */
     @GET("/hello")
     public String sayHi() {
@@ -58,23 +59,25 @@ public class ExampleController {
     This request makes a call to the passed in data source (The Database) which has been set up in App.java
      */
     @GET("/welcome")
-    public String welcomeFromDB() {
-        String welcomeMessageKey = "WelcomeMessage";
+    public ArrayList<String> welcomeFromDB() {
         // Create a connection
         try (Connection connection = dataSource.getConnection()) {
+            ArrayList<String> details = new ArrayList<>();
             // Create Statement (batch of SQL Commands)
             Statement statement = connection.createStatement();
             // Perform SQL Query
-            ResultSet set = statement.executeQuery("SELECT * FROM `Example` Where `Key` = '"+welcomeMessageKey+"'");
-            // Read First Result
-            set.next();
-            // Extract value from Result
-            String welcomeMessage = set.getString("Value");
-            // Return value
-            return welcomeMessage;
+            ResultSet set = statement.executeQuery("SELECT * FROM `Accounts`");
+
+            while (set.next()) {
+                String name = set.getString("Name");
+                double balance = set.getDouble("Balance");
+
+                details.add(name + " " + balance);
+            }
+            return details;
         } catch (SQLException e) {
             // If something does go wrong this will log the stack trace
-            logger.error("Database Error Occurred",e);
+            logger.error("Database Error Occurred", e);
             // And return a HTTP 500 error to the requester
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
         }

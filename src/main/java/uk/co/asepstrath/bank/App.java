@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class App extends Jooby {
 
@@ -59,14 +60,24 @@ public class App extends Jooby {
         Logger log = getLog();
         log.info("Starting Up...");
 
+        ArrayList<Account> accounts = new ArrayList<>();
+        accounts.add(new Account("Rachel", 50));
+        accounts.add(new Account("Monica", 100));
+        accounts.add(new Account("Phoebe", 76));
+        accounts.add(new Account("Joey", 23.90));
+        accounts.add(new Account("Chandler", 3));
+        accounts.add(new Account("Ross", 54.32));
+
         // Fetch DB Source
         DataSource ds = require(DataSource.class);
         // Open Connection to DB
         try (Connection connection = ds.getConnection()) {
             //
             Statement stmt = connection.createStatement();
-            stmt.executeUpdate("CREATE TABLE `Example` (`Key` varchar(255),`Value` varchar(255))");
-            stmt.executeUpdate("INSERT INTO Example " + "VALUES ('WelcomeMessage', 'Welcome to A Bank')");
+            stmt.executeUpdate("CREATE TABLE `Accounts` (`Name` varchar(255), `Balance` number)");
+            for (Account a : accounts) {
+                stmt.executeUpdate("INSERT INTO Accounts VALUES ('" + a.getName() + "', '" + a.getBalance() + "')");
+            }
         } catch (SQLException e) {
             log.error("Database Creation Error",e);
         }
