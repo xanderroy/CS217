@@ -69,10 +69,12 @@ public class ExampleController {
             ResultSet set = statement.executeQuery("SELECT * FROM `Accounts`");
 
             while (set.next()) {
+                String id = set.getString("ID");
                 String name = set.getString("Name");
                 double balance = set.getDouble("Balance");
+                boolean roundup = set.getBoolean("RoundUp");
 
-                details.add(name + " " + balance);
+                details.add(id + ", " + name + ", " + balance + ", " + roundup +"\n");
             }
             return details;
         } catch (SQLException e) {
@@ -122,5 +124,10 @@ public class ExampleController {
     @POST
     public String post(MyMessage message) {
         return "You successfully POSTed: "+message.Message+ " To: "+message.Recipient;
+    }
+
+    @GET ("/testing")
+    public String output(String string) {
+        return string;
     }
 }

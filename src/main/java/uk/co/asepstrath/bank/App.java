@@ -1,6 +1,12 @@
 package uk.co.asepstrath.bank;
 
 import io.jooby.netty.NettyServer;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.JsonNode;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONObject;
+
 import uk.co.asepstrath.bank.example.ExampleController;
 import io.jooby.Jooby;
 import io.jooby.handlebars.HandlebarsModule;
@@ -9,11 +15,16 @@ import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.example.ExampleController_;
 
+
+
 import javax.sql.DataSource;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class App extends Jooby {
 
@@ -59,6 +70,10 @@ public class App extends Jooby {
     public void onStart() {
         Logger log = getLog();
         log.info("Starting Up...");
+        String inline = "";
+
+        HttpResponse<JsonNode> response = Unirest.get("https://api.asep-strath.co.uk/api/accounts").asJson();
+        JSONArray arr = response.getBody().getArray();
 
         ArrayList<Account> accounts = new ArrayList<>();
         accounts.add(new Account("Rachel", 50));
@@ -74,9 +89,14 @@ public class App extends Jooby {
         try (Connection connection = ds.getConnection()) {
             //
             Statement stmt = connection.createStatement();
-            stmt.executeUpdate("CREATE TABLE `Accounts` (`Name` varchar(255), `Balance` number)");
-            for (Account a : accounts) {
-                stmt.executeUpdate("INSERT INTO Accounts VALUES ('" + a.getName() + "', '" + a.getBalance() + "')");
+            stmt.executeUpdate("CREATE TABLE `Accounts` (`ID` varchar(255), `Name` varchar(255), `Balance` number, `RoundUp` boolean)");
+            for (int i = 0; i < arr.length(); i++) {
+                String id = arr.getJSONObject(i).getString("id");
+                String name = arr.getJSONObject(i).getString("name");
+                name = name.replace("'", "''");
+                double balance = arr.getJSONObject(i).getDouble("startingBalance");
+                boolean roundup = arr.getJSONObject(i).getBoolean("roundUpEnabled");
+                stmt.executeUpdate("INSERT INTO Accounts VALUES ('" + id + "', '"+ name + "', '" + balance + "', '" + roundup + "')");
             }
         } catch (SQLException e) {
             log.error("Database Creation Error",e);
