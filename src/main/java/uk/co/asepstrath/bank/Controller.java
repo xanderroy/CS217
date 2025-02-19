@@ -1,12 +1,14 @@
 package uk.co.asepstrath.bank;
 
+import io.jooby.Context;
 import io.jooby.ModelAndView;
 import io.jooby.StatusCode;
 import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
 import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
-
+import io.jooby.*;
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -23,12 +25,13 @@ public class Controller {
     private final DataSource dataSource;
     private final Logger logger;
 
+
     public Controller(DataSource ds, Logger log) {
         dataSource = ds;
         logger = log;
     }
 
-    @GET("/welcome")
+    @Path("/welcome")
     public ArrayList<String> welcomeFromDB() {
         // Create a connection
         try (Connection connection = dataSource.getConnection()) {
@@ -44,7 +47,7 @@ public class Controller {
                 double balance = set.getDouble("Balance");
                 boolean roundup = set.getBoolean("RoundUp");
 
-                details.add(id + ", " + name + ", " + balance + ", " + roundup +"\n");
+                details.add(id + ", " + name + ", " + balance + ", " + roundup + "\n");
             }
             return details;
         } catch (SQLException e) {
@@ -53,5 +56,19 @@ public class Controller {
             // And return a HTTP 500 error to the requester
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
         }
+
+    }
+    @GET("/{id}")
+    public String UserDetails(String id, ArrayList<String> details, Context ctx) {
+        int i = 0;
+        String userid = ctx.path("id").toString();
+        for (i = 0; i <= details.size(); i++) {
+            if (userid == id) {
+                return "dog";
+            }
+        }
+        return "bark";
     }
 }
+
+
