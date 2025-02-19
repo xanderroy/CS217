@@ -75,14 +75,6 @@ public class App extends Jooby {
         HttpResponse<JsonNode> response = Unirest.get("https://api.asep-strath.co.uk/api/accounts").asJson();
         JSONArray arr = response.getBody().getArray();
 
-        ArrayList<Account> accounts = new ArrayList<>();
-        accounts.add(new Account("Rachel", 50));
-        accounts.add(new Account("Monica", 100));
-        accounts.add(new Account("Phoebe", 76));
-        accounts.add(new Account("Joey", 23.90));
-        accounts.add(new Account("Chandler", 3));
-        accounts.add(new Account("Ross", 54.32));
-
         // Fetch DB Source
         DataSource ds = require(DataSource.class);
         // Open Connection to DB
