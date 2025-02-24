@@ -45,6 +45,6 @@ public class Account {
 
     @Override
     public String toString() {
-        return new String("Name: " + name + ", Balance: " + (Math.round(balance.floatValue()*100))/100.);
+        return "Name: " + name + ", Balance: " + (Math.round(balance.floatValue() * 100)) / 100.;
     }
 }
