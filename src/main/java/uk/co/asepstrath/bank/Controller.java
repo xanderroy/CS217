@@ -19,7 +19,7 @@ import java.util.Random;
 
 
 @Path("/bank")
-public class Controller {
+public class  Controller {
     private final DataSource dataSource;
     private final Logger logger;
 
