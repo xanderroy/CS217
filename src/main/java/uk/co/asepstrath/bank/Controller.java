@@ -28,7 +28,7 @@ public class Controller {
         logger = log;
     }
 
-    @GET("/welcome")
+    @GET("/accounts")
     public ArrayList<String> welcomeFromDB() {
         // Create a connection
         try (Connection connection = dataSource.getConnection()) {
