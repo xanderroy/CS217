@@ -3,10 +3,7 @@ package uk.co.asepstrath.bank;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.jooby.Registry;
-import io.jooby.Route;
-import io.jooby.StatusCode;
-import io.jooby.Jooby;
+import io.jooby.*;
 import io.jooby.exception.StatusCodeException;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
