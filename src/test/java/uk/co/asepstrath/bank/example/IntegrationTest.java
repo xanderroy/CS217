@@ -18,4 +18,14 @@ public class IntegrationTest {
     static OkHttpClient client = new OkHttpClient();
 
 
+    public void shouldSayHi(int serverPort) throws IOException {
+        Request req = new Request.Builder()
+                .url("http://localhost:" + serverPort+"/example")
+                .build();
+
+        try (Response rsp = client.newCall(req).execute()) {
+            assertEquals("Welcome to Jooby!", rsp.body().string());
+            assertEquals(StatusCode.OK.value(), rsp.code());
+        }
+    }
 }

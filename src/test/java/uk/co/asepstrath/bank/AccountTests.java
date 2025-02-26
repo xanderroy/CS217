@@ -64,4 +64,16 @@ public class AccountTests {
 
     }
 
+    @Test
+    public void getNameTest() {
+        Account a = new Account("Stephen");
+        Assertions.assertEquals("Stephen", a.getName());
+    }
+
+    @Test
+    public void toStringTest() {
+        Account a = new Account("Stephen", 543.21);
+        Assertions.assertEquals("Name: Stephen, Balance: 543.21", a.toString());
+    }
+
 }
