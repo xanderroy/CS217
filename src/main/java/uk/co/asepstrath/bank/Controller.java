@@ -19,7 +19,7 @@ import java.util.Random;
 
 
 @Path("/bank")
-public class  Controller {
+public class Controller {
     private final DataSource dataSource;
     private final Logger logger;
 
@@ -54,4 +54,12 @@ public class  Controller {
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
         }
     }
+
+
+    @GET("/addAccountForm")
+    public ModelAndView showAddAccountForm() {
+        return new ModelAndView("addAccountForm.hbs", new HashMap<>()); // Renders addAccountForm.hbs
+    }
+
+
 }
