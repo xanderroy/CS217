@@ -6,7 +6,8 @@ import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
 import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
-
+import io.jooby.Context;
+import java.sql.*;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -54,4 +55,32 @@ public class Controller {
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
         }
     }
-}
+
+    @GET("/{id}")
+    public String UserDetails(Context ctx) {
+        String userId = ctx.path("id").value(); //sets the id from url as a string
+        try (Connection connection = dataSource.getConnection()) {
+            String query = "SELECT * FROM `Accounts` WHERE `ID` = ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) { //using prepared statement to make sure the datatype it expects is correct
+                statement.setString(1, userId); //puts the id into the query
+                ResultSet resultSet = statement.executeQuery();
+    
+                if (resultSet.next()) { //checks if there's an account with the matching id
+                    String id = resultSet.getString("ID");
+                    String name = resultSet.getString("Name");
+                    double balance = resultSet.getDouble("Balance");
+                    boolean roundup = resultSet.getBoolean("RoundUp");
+    
+                    return "ID: " + id + ", Name: " + name + ", Balance: " + balance + ", RoundUp: " + roundup; //returns matching account
+                } else {
+                    return "User not found"; //returns error statement when no matching account is detected
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Database Error Occurred", e);
+              // If something does go wrong this will log the stack trace
+            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
+            // And return a HTTP 500 error to the requester
+        }
+    }
+    }
