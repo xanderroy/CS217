@@ -55,6 +55,31 @@ public class Controller {
         }
     }
 
+    @GET("/accounts")
+    public ModelAndView showAccounts() {
+        try (Connection connection = dataSource.getConnection()) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM Accounts");
+
+            ArrayList<Map<String, Object>> accounts = new ArrayList<>();
+            while (resultSet.next()) {
+                Map<String, Object> account = new HashMap<>();
+                account.put("id", resultSet.getString("ID"));
+                account.put("name", resultSet.getString("Name"));
+                account.put("balance", resultSet.getDouble("Balance"));
+                account.put("roundup", resultSet.getBoolean("RoundUp"));
+                accounts.add(account);
+            }
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("accounts", accounts);
+
+            return new ModelAndView("accounts.hbs", model);
+        } catch (SQLException e) {
+            logger.error("Error fetching accounts", e);
+            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Error fetching accounts");
+        }
+    }
 
     @GET("/addAccountForm")
     public ModelAndView showAddAccountForm() {
