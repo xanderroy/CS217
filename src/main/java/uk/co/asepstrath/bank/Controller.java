@@ -7,6 +7,7 @@ import io.jooby.exception.StatusCodeException;
 import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
 import io.jooby.Context;
+import java.sql.*;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -60,7 +61,7 @@ public class Controller {
         String userId = ctx.path("id").value(); //sets the id from url as a string
         try (Connection connection = dataSource.getConnection()) {
             String query = "SELECT * FROM `Accounts` WHERE `ID` = ?";
-            try (PreparedStatement statement = connection.prepareStatement(query)) {
+            try (PreparedStatement statement = connection.prepareStatement(query)) { //using prepared statement to make sure the datatype is correct
                 statement.setString(1, userId); //puts the id into the query
                 ResultSet resultSet = statement.executeQuery();
     
