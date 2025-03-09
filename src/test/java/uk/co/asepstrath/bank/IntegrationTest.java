@@ -16,8 +16,17 @@ public class IntegrationTest {
     OkHttpClient client = new OkHttpClient();
 
     @Test
-    public void testAPIGet(int serverPort) throws IOException {
-        Request req = new Request.Builder().url("http://localhost:" + serverPort + "/bank/welcome").build();
+    public void testAllAccounts(int serverPort) throws IOException {
+        Request req = new Request.Builder().url("http://localhost:" + serverPort + "/bank/accounts").build();
+
+        try (Response rsp = client.newCall(req).execute()) {
+            assertEquals(StatusCode.OK.value(), rsp.code());
+        }
+    }
+
+    @Test
+    public void testOneAccount(int serverPort) throws IOException {
+        Request req = new Request.Builder().url("http://localhost:" + serverPort + "/bank/c9dfe369-c5f8-44fd-b9e2-f4fc5ac56ac2").build();
 
         try (Response rsp = client.newCall(req).execute()) {
             assertEquals(StatusCode.OK.value(), rsp.code());

@@ -49,6 +49,7 @@
         tr:hover {
             background-color: #ddd;
         }
+<<<<<<< HEAD
 
         a {
             text-decoration: none;
@@ -58,6 +59,8 @@
         a:hover {
             text-decoration: underline;
         }
+=======
+>>>>>>> 75d1beb3889e8c257e120e7e6992029d79369087
     </style>
 </head>
 <body>
@@ -76,7 +79,11 @@
         {{#each accounts}}
             <tr>
                 <td>{{id}}</td>
+<<<<<<< HEAD
                 <td><a href="/bank/{{id}}">{{name}}</a></td> <!-- Link to the user details page -->
+=======
+                <td>{{name}}</td>
+>>>>>>> 75d1beb3889e8c257e120e7e6992029d79369087
                 <td>£{{balance}}</td>
                 <td>{{roundup}}</td>
             </tr>
