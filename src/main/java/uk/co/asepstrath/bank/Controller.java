@@ -81,9 +81,39 @@ public class Controller {
         }
     }
 
+<<<<<<< Updated upstream
     @GET("/addAccountForm")
     public ModelAndView showAddAccountForm() {
         return new ModelAndView("addAccountForm.hbs", new HashMap<>()); // Renders addAccountForm.hbs
+=======
+
+    @GET("/{id}")
+    public ModelAndView UserDetails(Context ctx) {
+        String userId = ctx.path("id").value();
+        Map<String, Object> model = new HashMap<>();
+        try (Connection connection = dataSource.getConnection()) {
+            String query = "SELECT * FROM `Accounts` WHERE `ID` = ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, userId);
+                ResultSet resultSet = statement.executeQuery();
+
+                if (resultSet.next()) {
+                    model.put("id", resultSet.getString("ID"));
+                    model.put("name", resultSet.getString("Name"));
+                    model.put("balance", resultSet.getDouble("Balance"));
+                    model.put("roundup", resultSet.getBoolean("RoundUp"));
+                } else {
+                    model.put("error", "User not found");
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Database Error Occurred", e);
+            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
+        }
+        return new ModelAndView("userDetails.hbs", model);
+
+
+>>>>>>> Stashed changes
     }
 
 
