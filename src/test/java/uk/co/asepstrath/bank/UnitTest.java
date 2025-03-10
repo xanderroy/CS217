@@ -1,12 +1,9 @@
 package uk.co.asepstrath.bank;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.jooby.*;
 import io.jooby.exception.StatusCodeException;
-import org.junit.Before;
-import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 import java.sql.*;
