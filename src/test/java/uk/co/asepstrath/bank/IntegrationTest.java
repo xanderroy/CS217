@@ -32,4 +32,13 @@ public class IntegrationTest {
             assertEquals(StatusCode.OK.value(), rsp.code());
         }
     }
+
+    @Test
+    public void testTransWorks(int serverPort) throws IOException {
+        Request req = new Request.Builder().url("http://localhost:" + serverPort + "/bank/transactions/b32c1c03-6352-482c-a03d-b381a24fc142").build();
+
+        try (Response rsp = client.newCall(req).execute()) {
+            assertEquals(StatusCode.OK.value(), rsp.code());
+        }
+    }
 }

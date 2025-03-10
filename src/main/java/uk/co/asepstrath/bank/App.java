@@ -12,6 +12,7 @@ import io.jooby.Jooby;
 import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
+import okhttp3.Request;
 import org.slf4j.Logger;
 
 
@@ -19,6 +20,7 @@ import javax.sql.DataSource;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -68,29 +70,14 @@ public class App extends Jooby {
     public void onStart() {
         Logger log = getLog();
         log.info("Starting Up...");
-        String inline = "";
 
-        HttpResponse<JsonNode> response = Unirest.get("https://api.asep-strath.co.uk/api/accounts").asJson();
-        JSONArray arr = response.getBody().getArray();
 
         // Fetch DB Source
         DataSource ds = require(DataSource.class);
         // Open Connection to DB
-        try (Connection connection = ds.getConnection()) {
-            //
-            Statement stmt = connection.createStatement();
-            stmt.executeUpdate("CREATE TABLE `Accounts` (`ID` varchar(255), `Name` varchar(255), `Balance` number, `RoundUp` boolean)");
-            for (int i = 0; i < arr.length(); i++) {
-                String id = arr.getJSONObject(i).getString("id");
-                String name = arr.getJSONObject(i).getString("name");
-                name = name.replace("'", "''");
-                double balance = arr.getJSONObject(i).getDouble("startingBalance");
-                boolean roundup = arr.getJSONObject(i).getBoolean("roundUpEnabled");
-                stmt.executeUpdate("INSERT INTO Accounts VALUES ('" + id + "', '"+ name + "', '" + balance + "', '" + roundup + "')");
-            }
-        } catch (SQLException e) {
-            log.error("Database Creation Error",e);
-        }
+        API api = new API(ds, log);
+        api.getAccounts();
+        api.getTransactions();
     }
 
     /*

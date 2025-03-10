@@ -85,4 +85,36 @@ public class Controller {
 
 
     }
+
+    @GET("/transactions/{id}")
+    public String transactionDetails(Context ctx) {
+        String transID = ctx.path("id").value();
+
+        try (Connection connection = dataSource.getConnection()) {
+            String query = "SELECT * FROM `Transactions`";// WHERE `ID` = ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) { //using prepared statement to make sure the datatype it expects is correct
+                //statement.setString(1, transID);
+                System.out.println(statement);//puts the id into the query
+                ResultSet resultSet = statement.executeQuery();
+
+                if (resultSet.next()) { //checks if there's a transaction with the matching id
+                    String id = resultSet.getString("ID");
+                    String type = resultSet.getString("Type");
+                    double amount = resultSet.getDouble("Amount");
+                    String to = resultSet.getString("To");
+                    String from = resultSet.getString("From");
+
+                    return "ID: " + id + ", Type: " + type + ", Amount: " + amount + ", To: " + to + ", From: " + from; //returns matching trans
+                } else {
+                    return "User not found"; //returns error statement when no matching transaction is detected
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Database Error Occurred", e);
+            // If something does go wrong this will log the stack trace
+            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
+            // And return a HTTP 500 error to the requester
+        }
+    }
+
 }
