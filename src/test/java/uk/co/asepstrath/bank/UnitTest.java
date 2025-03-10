@@ -6,7 +6,6 @@ import io.jooby.*;
 import io.jooby.exception.StatusCodeException;
 import io.jooby.hikari.HikariModule;
 import io.jooby.netty.NettyServer;
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
