@@ -56,31 +56,34 @@ public class Controller {
 
 
     @GET("/{id}")
-    public String UserDetails(Context ctx) {
+    public ModelAndView UserDetails(Context ctx) {
         String userId = ctx.path("id").value(); //sets the id from url as a string
+        Map<String, Object> model = new HashMap<>();
         try (Connection connection = dataSource.getConnection()) {
-            String query = "SELECT * FROM `Accounts` WHERE `ID` = ?";
+            String query = "SELECT * FROM Accounts WHERE ID = ?";
             try (PreparedStatement statement = connection.prepareStatement(query)) { //using prepared statement to make sure the datatype it expects is correct
                 statement.setString(1, userId); //puts the id into the query
                 ResultSet resultSet = statement.executeQuery();
 
                 if (resultSet.next()) { //checks if there's an account with the matching id
-                    String id = resultSet.getString("ID");
-                    String name = resultSet.getString("Name");
-                    double balance = resultSet.getDouble("Balance");
-                    boolean roundup = resultSet.getBoolean("RoundUp");
-
-                    return "ID: " + id + ", Name: " + name + ", Balance: " + balance + ", RoundUp: " + roundup; //returns matching account
+                    model.put("id", resultSet.getString("ID"));
+                    model.put("name", resultSet.getString("Name"));
+                    model.put("balance", resultSet.getDouble("Balance"));
+                    model.put("roundup", resultSet.getBoolean("RoundUp"));
                 } else {
-                    return "User not found"; //returns error statement when no matching account is detected
+                    model.put("error", "User not found"); //returns error statement when no matching account is detected
                 }
             }
+
         } catch (SQLException e) {
             logger.error("Database Error Occurred", e);
             // If something does go wrong this will log the stack trace
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
             // And return a HTTP 500 error to the requester
         }
+        return new ModelAndView("userDetails.hbs", model);
+
+
     }
 
     @GET("/transactions/{id}")
