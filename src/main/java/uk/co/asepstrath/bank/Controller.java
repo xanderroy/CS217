@@ -126,7 +126,7 @@ public class Controller {
         for(int i = 0; i < idList.size(); i++ ) {
             if (idList.get(i).equals(userId)) { //Checks if its a valid id
                 idfound = true;
-                ctx.sendRedirect("/" + userId); //redirects to the account page
+                ctx.sendRedirect("/bank/" + userId); //redirects to the account page
                 break;
             }
         }
