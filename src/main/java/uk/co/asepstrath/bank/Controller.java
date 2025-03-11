@@ -7,12 +7,12 @@ import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
 import javax.sql.DataSource;
+import java.io.UnsupportedEncodingException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-
+import java.util.Base64;
+import java.net.http.HttpRequest;
+import java.net.URI;
+import java.util.*;
 
 @Path("/bank")
 public class Controller {
@@ -102,8 +102,29 @@ public class Controller {
         } catch (Exception e) {
             logger.error("Error in database", e);
         }
-
         return trans;
+    }
+    @POST("/oauth2/token")
+    public void fetchoAuth2Token(Context ctx) {
+        String authorizationHeader;
+        String clientCredentials = String.valueOf(ctx);
+        String preAuthorization = "scotbank" + "this1password2is3not4secure";
+        try {
+            authorizationHeader = Base64.getEncoder().encodeToString(preAuthorization.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        String urlBody = String.format("grantType=%s", clientCredentials);
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.asep-strath.co.uk/oauth2/token"))
+                    .header("Authorization", authorizationHeader)
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @GET("/transactions/{id}")
