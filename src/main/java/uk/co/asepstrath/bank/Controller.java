@@ -97,7 +97,7 @@ public class Controller {
 
             while (rs.next()) {
                 String id = rs.getString("ID");
-                Double amount = rs.getDouble("Amount");
+                double amount = rs.getDouble("Amount");
                 String type = rs.getString("Type");
                 String to = rs.getString("To");
                 String from = rs.getString("From");
