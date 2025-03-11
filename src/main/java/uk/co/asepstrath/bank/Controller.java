@@ -1,7 +1,9 @@
 package uk.co.asepstrath.bank;
 
+import ch.qos.logback.core.model.Model;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
+import io.jooby.Registry;
 import io.jooby.StatusCode;
 import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
@@ -106,7 +108,14 @@ public class Controller {
     }
 
     @GET("/login")
-    public void loginSite(@QueryParam("userId") String userId, Context ctx) {
+    public ModelAndView loginPage(Context ctx) {
+         return new ModelAndView("login.hbs", null);
+    }
+    @GET("/login")
+    public ModelAndView loginSite(@QueryParam("userId") String userId, Context ctx) {
+        if (userId == null || userId.trim().isEmpty()) {
+            return new ModelAndView("login.hbs", null);
+        }
         Boolean idfound = false;
         List idList = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
@@ -123,18 +132,20 @@ public class Controller {
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
             // And return a HTTP 500 error to the requester
         }
-        for(int i = 0; i < idList.size(); i++ ) {
+        for (int i = 0; i < idList.size(); i++) {
             if (idList.get(i).equals(userId)) { //Checks if its a valid id
                 idfound = true;
                 ctx.sendRedirect("/bank/" + userId); //redirects to the account page
                 break;
             }
         }
-            if(idfound==false){
-                throw new StatusCodeException(StatusCode.NOT_FOUND, "Invalid User ID"); //error 404
-            }
+        if (idfound == false) {
+            Map<String, String> model = new HashMap<>();
+            model.put("error", "Invalid UserID. Please try again.");
+            return new ModelAndView("login.hbs", model);
         }
-
+        return new ModelAndView("login.hbs", null);
+    }
 
 
     @GET("/transactions/{id}")
