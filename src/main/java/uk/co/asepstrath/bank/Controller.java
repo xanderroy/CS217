@@ -107,6 +107,7 @@ public class Controller {
 
     @GET("/login")
     public void loginSite(@QueryParam("userId") String userId, Context ctx) {
+        Boolean idfound = false;
         List idList = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             String query = "SELECT ID FROM Accounts"; //Just getting the ID's
@@ -122,17 +123,19 @@ public class Controller {
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
             // And return a HTTP 500 error to the requester
         }
-        for(int i = 0; i < idList.size(); i++ ){
-            if(idList.get(i).equals( userId)){ //Checks if its a valid id
+        for(int i = 0; i < idList.size(); i++ ) {
+            if (idList.get(i).equals(userId)) { //Checks if its a valid id
+                idfound = true;
                 ctx.sendRedirect("/" + userId); //redirects to the account page
                 break;
             }
-            else{
+        }
+            if(idfound=false){
                 throw new StatusCodeException(StatusCode.NOT_FOUND, "Invalid User ID"); //error 404
             }
         }
 
-    }
+
 
     @GET("/transactions/{id}")
     public String transactionDetails(Context ctx) {
