@@ -130,7 +130,7 @@ public class Controller {
                 break;
             }
         }
-            if(idfound=false){
+            if(idfound==false){
                 throw new StatusCodeException(StatusCode.NOT_FOUND, "Invalid User ID"); //error 404
             }
         }
