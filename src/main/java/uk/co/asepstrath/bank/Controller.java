@@ -6,6 +6,7 @@ import io.jooby.StatusCode;
 import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
 import kong.unirest.core.Unirest;
+import org.h2.command.Prepared;
 import org.slf4j.Logger;
 import io.jooby.*;
 import javax.annotation.PostConstruct;
@@ -54,7 +55,6 @@ public class Controller {
         }
     }
 
-
     @GET("/{id}")
     public ModelAndView UserDetails(Context ctx) {
         String userId = ctx.path("id").value(); //sets the id from url as a string
@@ -82,8 +82,32 @@ public class Controller {
             // And return a HTTP 500 error to the requester
         }
         return new ModelAndView("userDetails.hbs", model);
+    }
 
+    @GET("/{id}/transactions")
+    public ArrayList<String> AllTransAcc(Context ctx) {
+        String accountid = ctx.path("id").value();
+        ArrayList<String> trans = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection()) {
+            String query = ("SELECT * FROM `Transactions` WHERE `To` = ? OR `From` = ?");
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, accountid);
+            ps.setString(2, accountid);
+            ResultSet rs = ps.executeQuery();
 
+            while (rs.next()) {
+                String id = rs.getString("ID");
+                Double amount = rs.getDouble("Amount");
+                String type = rs.getString("Type");
+                String to = rs.getString("To");
+                String from = rs.getString("From");
+                trans.add("ID: " + id + ", amount: " + amount + ", type: " + type + ", to: " + to + ", from:" + from); //returns an absolute mess sorry haroon
+            }
+        } catch (Exception e) {
+            logger.error("Error in database", e);
+        }
+
+        return trans;
     }
 
     @GET("/transactions/{id}")
