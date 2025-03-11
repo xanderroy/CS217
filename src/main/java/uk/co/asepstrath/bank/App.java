@@ -1,30 +1,14 @@
 package uk.co.asepstrath.bank;
 
 import io.jooby.netty.NettyServer;
-import kong.unirest.core.HttpResponse;
-import kong.unirest.core.JsonNode;
-import kong.unirest.core.Unirest;
-import kong.unirest.core.json.JSONArray;
-import kong.unirest.core.json.JSONObject;
-
 
 import io.jooby.Jooby;
 import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
-import okhttp3.Request;
 import org.slf4j.Logger;
 
-
 import javax.sql.DataSource;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Scanner;
 
 public class App extends Jooby {
 

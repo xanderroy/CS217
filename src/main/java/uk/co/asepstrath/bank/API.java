@@ -1,19 +1,15 @@
 package uk.co.asepstrath.bank;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonNull;
-import com.google.gson.GsonBuilder;
+
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.json.JSONArray;
 
 import javax.sql.DataSource;
-import java.beans.ExceptionListener;
 import java.sql.*;
 
 import kong.unirest.core.json.JSONObject;
-import kong.unirest.gson.GsonObjectMapper;
 import org.slf4j.Logger;
 
 public class API {
@@ -42,7 +38,7 @@ public class API {
 
                 String id = thisobj.getString("id");
                 String name = thisobj.getString("name");
-                name = name.replace("'", "''");
+                name = name.replace("'", "''"); // '' = ' in sql
                 double balance = thisobj.getDouble("startingBalance");
                 boolean roundup = thisobj.getBoolean("roundUpEnabled");
 
@@ -68,8 +64,7 @@ public class API {
 
         for (int i = 0; i < 154; i++) { //154 is the number of pages in the transaction id
             log.info("Processing transactions page {}/153", i); //output which transactions being processed for errors
-            Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
-            HttpResponse<JsonNode> response = Unirest.get("https://api.asep-strath.co.uk/api/transactions?page=" + i).withObjectMapper(new GsonObjectMapper(gson)).header("Accept", "application/json").asJson();
+            HttpResponse<JsonNode> response = Unirest.get("https://api.asep-strath.co.uk/api/transactions?page=" + i).header("Accept", "application/json").asJson();
             //using a header requires the api to return JSON which is easier to parse
             JSONArray arr = response.getBody().getArray().getJSONObject(0).getJSONArray("results");
             //this gets the json as an array without the 'results' indentation
@@ -81,7 +76,7 @@ public class API {
                         String type = obj.getString("type");
                         double amount = obj.getDouble("amount");
                         String to = null, from = null;
-                        switch(type) {
+                        switch(type) { //switch statement allows null values to be added to the database without error, with correct fields being null.
                             case "PAYMENT", "TRANSFER":
                                 to = obj.getString("to");
                                 from = obj.getString("from");

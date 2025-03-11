@@ -5,17 +5,13 @@ import io.jooby.ModelAndView;
 import io.jooby.StatusCode;
 import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
-import kong.unirest.core.Unirest;
-import org.h2.command.Prepared;
 import org.slf4j.Logger;
-import io.jooby.*;
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
+
 
 
 @Path("/bank")
