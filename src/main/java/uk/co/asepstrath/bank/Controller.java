@@ -29,7 +29,7 @@ public class Controller {
     public ModelAndView showAccounts() {
         try (Connection connection = dataSource.getConnection()) {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM Accounts");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM Accounts"); //fetch all accounts from list
 
             ArrayList<Map<String, Object>> accounts = new ArrayList<>();
             while (resultSet.next()) {
@@ -85,7 +85,7 @@ public class Controller {
         String accountid = ctx.path("id").value();
         ArrayList<String> trans = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
-            String query = ("SELECT * FROM `Transactions` WHERE `To` = ? OR `From` = ?");
+            String query = ("SELECT * FROM `Transactions` WHERE `To` = ? OR `From` = ?"); //transaction is relevant to account if to or from is that account
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, accountid);
             ps.setString(2, accountid);
