@@ -106,8 +106,7 @@ public class Controller {
     }
 
     @GET("/login")
-    public void loginSite(@QueryParam("userId") String userId) {
-        Context ctx = null; //added this so i could redirect
+    public void loginSite(@QueryParam("userId") String userId, Context ctx) {
         List idList = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             String query = "SELECT ID FROM Accounts"; //Just getting the ID's
@@ -124,8 +123,9 @@ public class Controller {
             // And return a HTTP 500 error to the requester
         }
         for(int i = 0; i < idList.size(); i++ ){
-            if(idList.get(i) == userId){ //Checks if its a valid id
+            if(idList.get(i).equals( userId)){ //Checks if its a valid id
                 ctx.sendRedirect("/" + userId); //redirects to the account page
+                break;
             }
             else{
                 throw new StatusCodeException(StatusCode.NOT_FOUND, "Invalid User ID"); //error 404
