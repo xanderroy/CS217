@@ -33,12 +33,22 @@ public class API {
             Statement stmt = connection.createStatement();
             stmt.executeUpdate("CREATE TABLE `Accounts` (`ID` varchar(40), `Name` varchar(40), `Balance` number, `RoundUp` boolean)");
             for (int i = 0; i < arr.length(); i++) {
-                String id = arr.getJSONObject(i).getString("id");
-                String name = arr.getJSONObject(i).getString("name");
+                PreparedStatement ps = connection.prepareStatement("Insert INTO `Accounts` VALUES (?,?,?,?)"); //no sql injection weakspot
+
+                JSONObject thisobj = arr.getJSONObject(i);
+
+                String id = thisobj.getString("id");
+                String name = thisobj.getString("name");
                 name = name.replace("'", "''");
-                double balance = arr.getJSONObject(i).getDouble("startingBalance");
-                boolean roundup = arr.getJSONObject(i).getBoolean("roundUpEnabled");
-                stmt.executeUpdate("INSERT INTO Accounts VALUES ('" + id + "', '"+ name + "', '" + balance + "', '" + roundup + "')");
+                double balance = thisobj.getDouble("startingBalance");
+                boolean roundup = thisobj.getBoolean("roundUpEnabled");
+
+                ps.setString(1, id);
+                ps.setString(2, name);
+                ps.setDouble(3, balance);
+                ps.setBoolean(4, roundup);
+
+                ps.executeUpdate();
             }
         } catch (SQLException e) {
             log.error("Accounts Database Creation Error",e);
@@ -54,11 +64,12 @@ public class API {
         }
 
         for (int i = 0; i < 154; i++) { //154 is the number of pages in the transaction id
-            log.info("Processing transactions page {}/153", i);
+            log.info("Processing transactions page {}/153", i); //output which transactions being processed for errors
             HttpResponse<JsonNode> response = Unirest.get("https://api.asep-strath.co.uk/api/transactions?page=" + i).header("Accept", "application/json").asJson();
+            //using a header requires the api to return JSON which is easier to parse
             JSONArray arr = response.getBody().getArray().getJSONObject(0).getJSONArray("results");
+            //this gets the json as an array without the 'results' indentation
             try (Connection connection = ds.getConnection()) {
-                Statement stmt = connection.createStatement();
                 for (int j = 0; j < arr.length(); j++) {
                     JSONObject obj = arr.getJSONObject(j);
                     try {
@@ -68,7 +79,7 @@ public class API {
                         String to = obj.getString("to");
                         String from = obj.getString("from");
 
-                        String query = "INSERT INTO `Transactions` VALUES (?, ?, ?, ?, ?)";
+                        String query = "INSERT INTO `Transactions` VALUES (?, ?, ?, ?, ?)"; //adds transaction to db without sql injection exploit
                         PreparedStatement ps = connection.prepareStatement(query);
                         ps.setString(1, id);
                         ps.setString(2, type);
@@ -81,7 +92,6 @@ public class API {
                         continue;
                     }
                 }
-                Statement test = connection.createStatement();
             } catch (SQLException e) {
                 log.error("Transaction database error", e);
             }

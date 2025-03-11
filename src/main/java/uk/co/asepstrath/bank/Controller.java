@@ -91,10 +91,9 @@ public class Controller {
         String transID = ctx.path("id").value();
 
         try (Connection connection = dataSource.getConnection()) {
-            String query = "SELECT * FROM `Transactions`";// WHERE `ID` = ?";
+            String query = "SELECT * FROM `Transactions` WHERE `ID` = ?";
             try (PreparedStatement statement = connection.prepareStatement(query)) { //using prepared statement to make sure the datatype it expects is correct
-                //statement.setString(1, transID);
-                System.out.println(statement);//puts the id into the query
+                statement.setString(1, transID);
                 ResultSet resultSet = statement.executeQuery();
 
                 if (resultSet.next()) { //checks if there's a transaction with the matching id
