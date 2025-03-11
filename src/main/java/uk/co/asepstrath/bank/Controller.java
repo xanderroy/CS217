@@ -106,20 +106,21 @@ public class Controller {
     }
     @POST("/oauth2/token")
     public void fetchoAuth2Token(Context ctx) {
-        String authorizationHeader;
-        String clientCredentials = String.valueOf(ctx);
-        String preAuthorization = "scotbank" + "this1password2is3not4secure";
+        String authorizationHeader; //Preparing variable
+        String clientCredentials = String.valueOf(ctx); //Gets the client credentials from the context
+        String preAuthorization = "scotbank" + "this1password2is3not4secure"; //Password and User provided to then encode
         try {
-            authorizationHeader = Base64.getEncoder().encodeToString(preAuthorization.getBytes("UTF-8"));
+            authorizationHeader = Base64.getEncoder().encodeToString(preAuthorization.getBytes("UTF-8")); //Encoding
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); //incase the encoding fails
         }
-        String urlBody = String.format("grantType=%s", clientCredentials);
+        String Body = String.format("grantType=%s", clientCredentials); //creates the body for the request
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.asep-strath.co.uk/oauth2/token"))
                     .header("Authorization", authorizationHeader)
                     .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString(Body))
                     .build();
         } catch (Exception e) {
             throw new RuntimeException(e);
