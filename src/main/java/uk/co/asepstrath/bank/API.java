@@ -1,6 +1,8 @@
 package uk.co.asepstrath.bank;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonNull;
+import com.google.gson.GsonBuilder;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
@@ -11,6 +13,7 @@ import java.beans.ExceptionListener;
 import java.sql.*;
 
 import kong.unirest.core.json.JSONObject;
+import kong.unirest.gson.GsonObjectMapper;
 import org.slf4j.Logger;
 
 public class API {
@@ -58,14 +61,15 @@ public class API {
     public void getTransactions() {
         try (Connection connection = ds.getConnection()) {
             Statement stmt = connection.createStatement();
-            stmt.executeUpdate("CREATE TABLE `Transactions` (`ID` varchar(50), `Type` varchar(20), `Amount` number, `To` varchar(10), `From` varchar(40))");
+            stmt.executeUpdate("CREATE TABLE `Transactions` (`ID` varchar(50), `Type` varchar(20), `Amount` number, `To` varchar(40), `From` varchar(40))");
         } catch (SQLException e) {
             log.error("Transaction database error", e);
         }
 
         for (int i = 0; i < 154; i++) { //154 is the number of pages in the transaction id
             log.info("Processing transactions page {}/153", i); //output which transactions being processed for errors
-            HttpResponse<JsonNode> response = Unirest.get("https://api.asep-strath.co.uk/api/transactions?page=" + i).header("Accept", "application/json").asJson();
+            Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+            HttpResponse<JsonNode> response = Unirest.get("https://api.asep-strath.co.uk/api/transactions?page=" + i).withObjectMapper(new GsonObjectMapper(gson)).header("Accept", "application/json").asJson();
             //using a header requires the api to return JSON which is easier to parse
             JSONArray arr = response.getBody().getArray().getJSONObject(0).getJSONArray("results");
             //this gets the json as an array without the 'results' indentation
@@ -76,8 +80,23 @@ public class API {
                         String id = obj.getString("id");
                         String type = obj.getString("type");
                         double amount = obj.getDouble("amount");
-                        String to = obj.getString("to");
-                        String from = obj.getString("from");
+                        String to = null, from = null;
+                        switch(type) {
+                            case "PAYMENT", "TRANSFER":
+                                to = obj.getString("to");
+                                from = obj.getString("from");
+                                break;
+                            case "DEPOSIT":
+                                to = obj.getString("to");
+                                break;
+                            case "WITHDRAWAL":
+                                from = obj.getString("from");
+                                break;
+                            case "ROUNDUP":
+                                to = obj.getString("to");
+                            default:
+                                log.info("unrecognised transaction type");
+                        }
 
                         String query = "INSERT INTO `Transactions` VALUES (?, ?, ?, ?, ?)"; //adds transaction to db without sql injection exploit
                         PreparedStatement ps = connection.prepareStatement(query);
@@ -89,7 +108,7 @@ public class API {
 
                         ps.executeUpdate();
                     } catch (Exception e) {
-                        continue;
+                        log.error("Exception", e);
                     }
                 }
             } catch (SQLException e) {
