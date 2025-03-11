@@ -104,26 +104,32 @@ public class Controller {
         }
         return trans;
     }
-    @POST("/oauth2/token")
-    public void fetchoAuth2Token(Context ctx) {
-        String authorizationHeader; //Preparing variable
-        String clientCredentials = String.valueOf(ctx); //Gets the client credentials from the context
-        String preAuthorization = "scotbank" + "this1password2is3not4secure"; //Password and User provided to then encode
-        try {
-            authorizationHeader = Base64.getEncoder().encodeToString(preAuthorization.getBytes("UTF-8")); //Encoding
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e); //incase the encoding fails
+
+    @GET("/login")
+    public void loginSite(@QueryParam("userId") String userId) {
+        Context ctx = null; //added this so i could redirect
+        List idList = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection()) {
+            String query = "SELECT ID FROM Accounts"; //Just getting the ID's
+            PreparedStatement statement = connection.prepareStatement(query); //Preparing the query
+            ResultSet resultSet = statement.executeQuery(); //Executing
+            while (resultSet.next()) { //checks if there's an account with the matching id
+                idList.add(resultSet.getString("ID")); //Just getting the ID's
+            }
+
+        } catch (SQLException e) {
+            logger.error("Database Error Occurred", e);
+            // If something does go wrong this will log the stack trace
+            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
+            // And return a HTTP 500 error to the requester
         }
-        String Body = String.format("grantType=%s", clientCredentials); //creates the body for the request
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.asep-strath.co.uk/oauth2/token"))
-                    .header("Authorization", authorizationHeader)
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublishers.ofString(Body))
-                    .build();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        for(int i = 0; i < idList.size(); i++ ){
+            if(idList.get(i) == userId){ //Checks if its a valid id
+                ctx.sendRedirect("/" + userId); //redirects to the account page
+            }
+            else{
+                throw new StatusCodeException(StatusCode.NOT_FOUND, "Invalid User ID"); //error 404
+            }
         }
 
     }
