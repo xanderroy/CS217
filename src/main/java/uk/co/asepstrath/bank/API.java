@@ -38,7 +38,6 @@ public class API {
 
                 String id = thisobj.getString("id");
                 String name = thisobj.getString("name");
-                name = name.replace("'", "''"); // '' = ' in sql
                 double balance = thisobj.getDouble("startingBalance");
                 boolean roundup = thisobj.getBoolean("roundUpEnabled");
 
