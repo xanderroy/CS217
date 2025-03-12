@@ -83,28 +83,32 @@ public class Controller {
     }
 
     @GET("/{id}/transactions")
-    public ArrayList<String> AllTransAcc(Context ctx) {
+    public ModelAndView AllTransAcc(Context ctx) {
         String accountid = ctx.path("id").value();
-        ArrayList<String> trans = new ArrayList<>();
+        ArrayList<Map<String, Object>> transactions = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
-            String query = ("SELECT * FROM `Transactions` WHERE `To` = ? OR `From` = ?"); //transaction is relevant to account if to or from is that account
+            String query = ("SELECT * FROM `Transactions` WHERE `To` = ? OR `From` = ?"); //transaction is relevant to account
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, accountid);
             ps.setString(2, accountid);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String id = rs.getString("ID");
-                double amount = rs.getDouble("Amount");
-                String type = rs.getString("Type");
-                String to = rs.getString("To");
-                String from = rs.getString("From");
-                trans.add("ID: " + id + ", amount: " + amount + ", type: " + type + ", to: " + to + ", from:" + from); //returns an absolute mess sorry haroon
+                Map<String, Object> transaction = new HashMap<>();
+                transaction.put("id", rs.getString("ID"));
+                transaction.put("amount", rs.getDouble("Amount"));
+                transaction.put("type", rs.getString("Type"));
+                transaction.put("to", rs.getString("To"));
+                transaction.put("from", rs.getString("From"));
+                transactions.add(transaction);
             }
         } catch (Exception e) {
             logger.error("Error in database", e);
         }
-        return trans;
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("transactions", transactions);
+        return new ModelAndView("transactions.hbs", model);
     }
 
     @GET("/login")
@@ -150,33 +154,32 @@ public class Controller {
 
 
     @GET("/transactions/{id}")
-    public String transactionDetails(Context ctx) {
+    public ModelAndView transactionDetails(Context ctx) {
         String transID = ctx.path("id").value();
+        Map<String, Object> model = new HashMap<>();
 
         try (Connection connection = dataSource.getConnection()) {
             String query = "SELECT * FROM `Transactions` WHERE `ID` = ?";
-            try (PreparedStatement statement = connection.prepareStatement(query)) { //using prepared statement to make sure the datatype it expects is correct
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, transID);
                 ResultSet resultSet = statement.executeQuery();
 
-                if (resultSet.next()) { //checks if there's a transaction with the matching id
-                    String id = resultSet.getString("ID");
-                    String type = resultSet.getString("Type");
-                    double amount = resultSet.getDouble("Amount");
-                    String to = resultSet.getString("To");
-                    String from = resultSet.getString("From");
-
-                    return "ID: " + id + ", Type: " + type + ", Amount: " + amount + ", To: " + to + ", From: " + from; //returns matching trans
+                if (resultSet.next()) {
+                    model.put("id", resultSet.getString("ID"));
+                    model.put("type", resultSet.getString("Type"));
+                    model.put("amount", resultSet.getDouble("Amount"));
+                    model.put("to", resultSet.getString("To"));
+                    model.put("from", resultSet.getString("From"));
                 } else {
-                    return "User not found"; //returns error statement when no matching transaction is detected
+                    model.put("error", "Transaction not found");
                 }
             }
         } catch (SQLException e) {
             logger.error("Database Error Occurred", e);
-            // If something does go wrong this will log the stack trace
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
-            // And return a HTTP 500 error to the requester
         }
+
+        return new ModelAndView("transactionDetails.hbs", model);
     }
 
 }
