@@ -116,6 +116,7 @@ public class Controller {
         if (userId == null || userId.trim().isEmpty()) {
             return new ModelAndView("login.hbs", null);
         }
+        userId = userId.trim();
         Boolean idfound = false;
         List idList = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
