@@ -1,18 +1,20 @@
 package uk.co.asepstrath.bank;
 
+import ch.qos.logback.core.model.Model;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
+import io.jooby.Registry;
 import io.jooby.StatusCode;
 import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
 import javax.sql.DataSource;
+import java.io.UnsupportedEncodingException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-
+import java.util.Base64;
+import java.net.http.HttpRequest;
+import java.net.URI;
+import java.util.*;
 
 @Path("/bank")
 public class Controller {
@@ -108,6 +110,48 @@ public class Controller {
         model.put("transactions", transactions);
         return new ModelAndView("transactions.hbs", model);
     }
+
+    @GET("/login")
+    public ModelAndView loginPage(Context ctx) {
+         return new ModelAndView("login.hbs", null);
+    }
+    @GET("/login")
+    public ModelAndView loginSite(@QueryParam("userId") String userId, Context ctx) {
+        if (userId == null || userId.trim().isEmpty()) {
+            return new ModelAndView("login.hbs", null);
+        }
+        userId = userId.trim();
+        Boolean idfound = false;
+        List idList = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection()) {
+            String query = "SELECT ID FROM Accounts"; //Just getting the ID's
+            PreparedStatement statement = connection.prepareStatement(query); //Preparing the query
+            ResultSet resultSet = statement.executeQuery(); //Executing
+            while (resultSet.next()) { //checks if there's an account with the matching id
+                idList.add(resultSet.getString("ID")); //Just getting the ID's
+            }
+
+        } catch (SQLException e) {
+            logger.error("Database Error Occurred", e);
+            // If something does go wrong this will log the stack trace
+            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
+            // And return a HTTP 500 error to the requester
+        }
+        for (int i = 0; i < idList.size(); i++) {
+            if (idList.get(i).equals(userId)) { //Checks if its a valid id
+                idfound = true;
+                ctx.sendRedirect("/bank/" + userId); //redirects to the account page
+                break;
+            }
+        }
+        if (idfound == false) {
+            Map<String, String> model = new HashMap<>();
+            model.put("error", "Invalid UserID. Please try again.");
+            return new ModelAndView("login.hbs", model);
+        }
+        return new ModelAndView("login.hbs", null);
+    }
+
 
     @GET("/transactions/{id}")
     public ModelAndView transactionDetails(Context ctx) {
