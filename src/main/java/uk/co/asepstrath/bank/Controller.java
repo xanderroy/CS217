@@ -66,7 +66,8 @@ public class Controller {
                 if (resultSet.next()) { //checks if there's an account with the matching id
                     model.put("id", resultSet.getString("ID"));
                     model.put("name", resultSet.getString("Name"));
-                    model.put("balance", resultSet.getDouble("Balance"));
+                    double balance = Accounts.getAccount(userId).getBalance();
+                    model.put("balance", balance);
                     model.put("roundup", resultSet.getBoolean("RoundUp"));
                 } else {
                     model.put("error", "User not found"); //returns error statement when no matching account is detected

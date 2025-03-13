@@ -7,6 +7,8 @@ public class Account {
 
     private BigDecimal balance = new BigDecimal(0);
     private String name;
+    private Boolean roundUp = false;
+    private String id;
 
     Account() {
 
@@ -19,6 +21,13 @@ public class Account {
     Account(String name, double b) {
         this.balance = new BigDecimal(b);
         this.name = name;
+    }
+
+    Account(String name, double b, boolean r, String id) {
+        this.balance = new BigDecimal(b);
+        this.name = name;
+        this.roundUp = r;
+        this.id = id;
     }
 
     public void deposit(double amount) {
@@ -39,6 +48,10 @@ public class Account {
         balance = balance.subtract(toSub);
     }
 
+    public void enableRoundUps() {
+        this.roundUp = true;
+    }
+
     public String getName() {
         return name;
     }
@@ -46,5 +59,21 @@ public class Account {
     @Override
     public String toString() {
         return "Name: " + name + ", Balance: " + (Math.round(balance.floatValue() * 100)) / 100.;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Boolean getRoundUp() {
+        return roundUp;
+    }
+
+    public void setRoundUp(Boolean roundUp) {
+        this.roundUp = roundUp;
     }
 }
