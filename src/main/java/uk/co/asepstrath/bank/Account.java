@@ -36,15 +36,11 @@ public class Account {
     }
 
     public double getBalance() {
-        double a = (Math.round(balance.floatValue()*100))/100.;
-        return a;
+        return (Math.round(balance.floatValue()*100))/100.;
     }
 
     public void withdraw(double amount) {
         BigDecimal toSub = new BigDecimal(amount);
-        if (balance.subtract(toSub).floatValue() < 0) {
-            throw new ArithmeticException();
-        }
         balance = balance.subtract(toSub);
     }
 

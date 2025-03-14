@@ -26,8 +26,8 @@ public class Accounts {
             }
         }
 
-        toAcc.withdraw(amount);
-        fromAcc.deposit(amount);
+        toAcc.deposit(amount);
+        fromAcc.withdraw(amount);
     }
 
     public static Account getAccount(String id) {
