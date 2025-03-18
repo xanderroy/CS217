@@ -1,6 +1,8 @@
 package uk.co.asepstrath.bank;
 
 
+import io.jooby.StatusCode;
+import io.jooby.exception.StatusCodeException;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
@@ -41,12 +43,14 @@ public class API {
                 double balance = thisobj.getDouble("startingBalance");
                 boolean roundup = thisobj.getBoolean("roundUpEnabled");
 
+                Accounts.addAccount(id, balance, roundup, name); //add the account to accounts list
+
                 ps.setString(1, id);
                 ps.setString(2, name);
                 ps.setDouble(3, balance);
                 ps.setBoolean(4, roundup);
 
-                ps.executeUpdate();
+                ps.executeUpdate(); //add the account into the database
             }
         } catch (SQLException e) {
             log.error("Accounts Database Creation Error",e);
@@ -108,6 +112,45 @@ public class API {
             } catch (SQLException e) {
                 log.error("Transaction database error", e);
             }
+        }
+    }
+
+    public void applyTransactions() {
+        String transactionsQuery = "SELECT * FROM `Transactions`";
+
+        try (Connection connection = ds.getConnection();
+             PreparedStatement tps = connection.prepareStatement(transactionsQuery);
+        ) {
+            ResultSet trs = tps.executeQuery();
+
+            double balance = 0;
+
+            while (trs.next()) {
+                switch(trs.getString("Type")) {
+                    case "DEPOSIT":
+                        Accounts.getAccount(trs.getString("To")).deposit(trs.getDouble("Amount"));
+                        break;
+                    case "WITHDRAWAL":
+                        Accounts.getAccount(trs.getString("From")).withdraw(trs.getDouble("Amount"));
+                        break;
+                    case "TRANSFER":
+                        Accounts.getAccount(trs.getString("To")).deposit(trs.getDouble("Amount"));
+                        Accounts.getAccount(trs.getString("From")).withdraw(trs.getDouble("Amount"));
+                        break;
+                    case "PAYMENT":
+                        Accounts.getAccount(trs.getString("From")).withdraw(trs.getDouble("Amount"));
+                        break;
+                    case "ROUNDUP":
+                        //nothing for now
+                        break;
+                    default:
+                        log.error("Error in processing transactions, unknown transaction type.");
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("Error in processing Transactions", e);
+            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
         }
     }
 }

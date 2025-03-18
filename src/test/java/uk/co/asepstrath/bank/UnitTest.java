@@ -24,9 +24,9 @@ public class UnitTest extends Jooby {
         api.getAccounts();
         try( Connection connection = ds.getConnection()) {
             Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM `Accounts` WHERE `ID` = '04f6ab33-8208-4234-aabd-b6a8be8493da'");
+            ResultSet rs = stmt.executeQuery("SELECT * FROM `Accounts` WHERE `ID` = '0002c352-6f10-4bd4-8783-074705090db4'");
             rs.next();
-            assertEquals("04f6ab33-8208-4234-aabd-b6a8be8493da", rs.getString("ID"));
+            assertEquals("0002c352-6f10-4bd4-8783-074705090db4", rs.getString("ID"));
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -37,9 +37,9 @@ public class UnitTest extends Jooby {
         api.getTransactions();
         try( Connection connection = ds.getConnection()) {
             Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM `Transactions` WHERE `ID` = 'b32c1c03-6352-482c-a03d-b381a24fc142'");
+            ResultSet rs = stmt.executeQuery("SELECT * FROM `Transactions` WHERE `ID` = '0167a486-3606-4841-86e6-6bd44786972d'");
             rs.next();
-            assertEquals("b32c1c03-6352-482c-a03d-b381a24fc142", rs.getString("ID"));
+            assertEquals("0167a486-3606-4841-86e6-6bd44786972d", rs.getString("ID"));
         } catch (Exception e) {
             e.printStackTrace();
             fail();

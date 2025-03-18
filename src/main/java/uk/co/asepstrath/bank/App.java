@@ -62,6 +62,7 @@ public class App extends Jooby {
         API api = new API(ds, log);
         api.getAccounts();
         api.getTransactions();
+        api.applyTransactions();
         log.info("Startup complete.");
     }
 
