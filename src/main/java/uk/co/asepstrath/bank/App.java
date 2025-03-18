@@ -63,6 +63,7 @@ public class App extends Jooby {
         api.getAccounts();
         api.getTransactions();
         api.applyTransactions();
+        api.getBusinesses();
         log.info("Startup complete.");
     }
 
