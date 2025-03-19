@@ -20,7 +20,8 @@ import java.util.*;
 public class Controller {
     private final DataSource dataSource;
     private final Logger logger;
-
+    private boolean isAdmin = false;
+    private boolean isLoggedIn = false;
 
     public Controller(DataSource ds, Logger log) {
         dataSource = ds;
@@ -29,27 +30,31 @@ public class Controller {
 
     @GET("/accounts")
     public ModelAndView showAccounts() {
-        try (Connection connection = dataSource.getConnection()) {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM Accounts"); //fetch all accounts from list
+        if(isAdmin){
+            try (Connection connection = dataSource.getConnection()) {
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM Accounts"); //fetch all accounts from list
 
-            ArrayList<Map<String, Object>> accounts = new ArrayList<>();
-            while (resultSet.next()) {
-                Map<String, Object> account = new HashMap<>();
-                account.put("id", resultSet.getString("ID"));
-                account.put("name", resultSet.getString("Name"));
-                account.put("balance", resultSet.getDouble("Balance"));
-                account.put("roundup", resultSet.getBoolean("RoundUp"));
-                accounts.add(account);
+                ArrayList<Map<String, Object>> accounts = new ArrayList<>();
+                while (resultSet.next()) {
+                    Map<String, Object> account = new HashMap<>();
+                    account.put("id", resultSet.getString("ID"));
+                    account.put("name", resultSet.getString("Name"));
+                    account.put("balance", resultSet.getDouble("Balance"));
+                    account.put("roundup", resultSet.getBoolean("RoundUp"));
+                    accounts.add(account);
+                }
+
+                Map<String, Object> model = new HashMap<>();
+                model.put("accounts", accounts);
+
+                return new ModelAndView("accounts.hbs", model);
+            } catch (SQLException e) {
+                logger.error("Error fetching accounts", e);
+                throw new StatusCodeException(StatusCode.SERVER_ERROR, "Error fetching accounts");
             }
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("accounts", accounts);
-
-            return new ModelAndView("accounts.hbs", model);
-        } catch (SQLException e) {
-            logger.error("Error fetching accounts", e);
-            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Error fetching accounts");
+        } else{
+            return new ModelAndView("login.hbs", null);
         }
     }
 
@@ -122,6 +127,7 @@ public class Controller {
             return new ModelAndView("login.hbs", null);
         } else if(userId.equals("admin")){
             ctx.sendRedirect("/bank/accounts");
+            isAdmin = true;
         }
         userId = userId.trim();
         Boolean idfound = false;
@@ -143,6 +149,7 @@ public class Controller {
         for (int i = 0; i < idList.size(); i++) {
             if (idList.get(i).equals(userId)) { //Checks if its a valid id
                 idfound = true;
+                isLoggedIn = true;
                 ctx.sendRedirect("/bank/" + userId); //redirects to the account page
                 break;
             }
