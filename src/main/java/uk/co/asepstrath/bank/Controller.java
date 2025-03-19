@@ -22,6 +22,7 @@ public class Controller {
     private final Logger logger;
     private boolean isAdmin = false;
     private boolean isLoggedIn = false;
+    private String currentUserId;
 
     public Controller(DataSource ds, Logger log) {
         dataSource = ds;
@@ -62,30 +63,35 @@ public class Controller {
     public ModelAndView UserDetails(Context ctx) {
         String userId = ctx.path("id").value(); //sets the id from url as a string
         Map<String, Object> model = new HashMap<>();
-        try (Connection connection = dataSource.getConnection()) {
-            String query = "SELECT * FROM Accounts WHERE ID = ?";
-            try (PreparedStatement statement = connection.prepareStatement(query)) { //using prepared statement to make sure the datatype it expects is correct
-                statement.setString(1, userId); //puts the id into the query
-                ResultSet resultSet = statement.executeQuery();
+        if(!(currentUserId.equals(userId) || isAdmin)){
+            model.put("error", "Invalid UserID.");
+            return new ModelAndView("userDetails.hbs", model);
+        }else{
+            try (Connection connection = dataSource.getConnection()) {
+                String query = "SELECT * FROM Accounts WHERE ID = ?";
+                try (PreparedStatement statement = connection.prepareStatement(query)) { //using prepared statement to make sure the datatype it expects is correct
+                    statement.setString(1, userId); //puts the id into the query
+                    ResultSet resultSet = statement.executeQuery();
 
-                if (resultSet.next()) { //checks if there's an account with the matching id
-                    model.put("id", resultSet.getString("ID"));
-                    model.put("name", resultSet.getString("Name"));
-                    double balance = Accounts.getAccount(userId).getBalance();
-                    model.put("balance", balance);
-                    model.put("roundup", resultSet.getBoolean("RoundUp"));
-                } else {
-                    model.put("error", "User not found"); //returns error statement when no matching account is detected
+                    if (resultSet.next()) { //checks if there's an account with the matching id
+                        model.put("id", resultSet.getString("ID"));
+                        model.put("name", resultSet.getString("Name"));
+                        double balance = Accounts.getAccount(userId).getBalance();
+                        model.put("balance", balance);
+                        model.put("roundup", resultSet.getBoolean("RoundUp"));
+                    } else {
+                        model.put("error", "User not found"); //returns error statement when no matching account is detected
+                    }
                 }
-            }
 
-        } catch (SQLException e) {
-            logger.error("Database Error Occurred", e);
-            // If something does go wrong this will log the stack trace
-            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
-            // And return a HTTP 500 error to the requester
+            } catch (SQLException e) {
+                logger.error("Database Error Occurred", e);
+                // If something does go wrong this will log the stack trace
+                throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
+                // And return a HTTP 500 error to the requester
+            }
+            return new ModelAndView("userDetails.hbs", model);
         }
-        return new ModelAndView("userDetails.hbs", model);
     }
 
     @GET("/{id}/transactions")
@@ -128,6 +134,7 @@ public class Controller {
         } else if(userId.equals("admin")){
             ctx.sendRedirect("/bank/accounts");
             isAdmin = true;
+            currentUserId = userId;
         }
         userId = userId.trim();
         Boolean idfound = false;
@@ -150,6 +157,8 @@ public class Controller {
             if (idList.get(i).equals(userId)) { //Checks if its a valid id
                 idfound = true;
                 isLoggedIn = true;
+                isAdmin = false;
+                currentUserId = userId;
                 ctx.sendRedirect("/bank/" + userId); //redirects to the account page
                 break;
             }
@@ -167,29 +176,33 @@ public class Controller {
     public ModelAndView transactionDetails(Context ctx) {
         String transID = ctx.path("id").value();
         Map<String, Object> model = new HashMap<>();
+            try (Connection connection = dataSource.getConnection()) {
+                String query = "SELECT * FROM `Transactions` WHERE `ID` = ?";
+                try (PreparedStatement statement = connection.prepareStatement(query)) {
+                    statement.setString(1, transID);
+                    ResultSet resultSet = statement.executeQuery();
 
-        try (Connection connection = dataSource.getConnection()) {
-            String query = "SELECT * FROM `Transactions` WHERE `ID` = ?";
-            try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setString(1, transID);
-                ResultSet resultSet = statement.executeQuery();
-
-                if (resultSet.next()) {
-                    model.put("id", resultSet.getString("ID"));
-                    model.put("type", resultSet.getString("Type"));
-                    model.put("amount", resultSet.getDouble("Amount"));
-                    model.put("to", resultSet.getString("To"));
-                    model.put("from", resultSet.getString("From"));
-                } else {
-                    model.put("error", "Transaction not found");
+                    if (resultSet.next()) {
+                        model.put("id", resultSet.getString("ID"));
+                        model.put("type", resultSet.getString("Type"));
+                        model.put("amount", resultSet.getDouble("Amount"));
+                        model.put("to", resultSet.getString("To"));
+                        model.put("from", resultSet.getString("From"));
+                    } else {
+                        model.put("error", "Transaction not found");
+                    }
                 }
+            } catch (SQLException e) {
+                logger.error("Database Error Occurred", e);
+                throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
             }
-        } catch (SQLException e) {
-            logger.error("Database Error Occurred", e);
-            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
+            if(!(currentUserId.equals(model.get("to")) || currentUserId.equals(model.get("from")))){
+                model.put("error", "Invalid TransactionID.");
+                return new ModelAndView("transactionDetails.hbs", model);
+            } else {
+                return new ModelAndView("transactionDetails.hbs", model);
+            }
         }
-
-        return new ModelAndView("transactionDetails.hbs", model);
     }
 
-}
+
