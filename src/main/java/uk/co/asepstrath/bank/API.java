@@ -125,13 +125,6 @@ public class API {
     }
 
     public void getBusinesses() {
-        try (Connection connection = ds.getConnection()) {
-            Statement stmt = connection.createStatement();
-            stmt.executeUpdate("CREATE TABLE `Business` (`ID` varchar(3), `Name` varchar(20), `Category` varchar(20), `Sanctioned` boolean);");
-        } catch (SQLException e) {
-            log.error("DB Error in businesses", e);
-        }
-
         try {
             File.createTempFile("businesses", "csv");
         } catch (IOException e) {
