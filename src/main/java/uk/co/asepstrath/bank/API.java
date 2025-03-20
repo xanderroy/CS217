@@ -125,11 +125,6 @@ public class API {
     }
 
     public void getBusinesses() {
-        try {
-            File.createTempFile("businesses", "csv");
-        } catch (IOException e) {
-            log.error("error in businesses file creation", e);
-        }
 
         HttpResponse<File> response = Unirest.get("https://api.asep-strath.co.uk/api/businesses").asFile("businesses.csv", REPLACE_EXISTING);
 
