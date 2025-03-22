@@ -1,19 +1,13 @@
 package uk.co.asepstrath.bank;
 
-import ch.qos.logback.core.model.Model;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
-import io.jooby.Registry;
 import io.jooby.StatusCode;
 import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
 import javax.sql.DataSource;
-import java.io.UnsupportedEncodingException;
 import java.sql.*;
-import java.util.Base64;
-import java.net.http.HttpRequest;
-import java.net.URI;
 import java.util.*;
 
 @Path("/bank")
@@ -190,8 +184,8 @@ public class Controller {
         return new ModelAndView("transactionDetails.hbs", model);
     }
 
-    @GET ("/{id}/summary")
-    public HashMap<String, Double> summaryOfSpending(Context ctx) {
+    @GET("/{id}/summary")
+    public ModelAndView summaryOfSpending(Context ctx) {
         String id = ctx.path("id").value();
         HashMap<String, Double> summary = new HashMap<>();
         ArrayList<Map<String, Object>> transactions = getAccTransactions(id);
@@ -200,17 +194,21 @@ public class Controller {
             if (Objects.equals(transactions.get(i).get("type").toString(), "PAYMENT")) {
                 String businessID = transactions.get(i).get("to").toString();
 
+                // Assuming Businesses is a class that provides business categories by business ID.
                 String category = Businesses.getBusinessByID(businessID).getCategory();
 
                 if (summary.get(category) == null) {
                     summary.put(category, (Double) transactions.get(i).get("amount"));
+                } else {
+                    summary.replace(category, summary.get(category) + (Double) transactions.get(i).get("amount"));
                 }
-
-                summary.replace(category, summary.get(category) + (Double) transactions.get(i).get("amount"));
             }
         }
 
-        return summary;
+        Map<String, Object> model = new HashMap<>();
+        model.put("summary", summary);  // Passing the summary data to the view.
+        return new ModelAndView("summary.hbs", model);  // Rendering the summary view.
     }
+
 
 }
