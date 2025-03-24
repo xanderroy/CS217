@@ -1,20 +1,14 @@
 package uk.co.asepstrath.bank;
 
-import ch.qos.logback.core.model.Model;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
-import io.jooby.Registry;
 import io.jooby.StatusCode;
 import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
 import org.h2.engine.Mode;
 import org.slf4j.Logger;
 import javax.sql.DataSource;
-import java.io.UnsupportedEncodingException;
 import java.sql.*;
-import java.util.Base64;
-import java.net.http.HttpRequest;
-import java.net.URI;
 import java.util.*;
 
 @Path("/bank")
@@ -28,6 +22,10 @@ public class Controller {
     public Controller(DataSource ds, Logger log) {
         dataSource = ds;
         logger = log;
+    }
+    @GET("/")
+    public ModelAndView homepage() {
+        return new ModelAndView("homepage.hbs", null);
     }
 
     @GET("/accounts")
@@ -98,12 +96,20 @@ public class Controller {
     @GET("/{id}/transactions")
     public ModelAndView AllTransAcc(Context ctx) {
         String accountid = ctx.path("id").value();
+        ArrayList<Map<String, Object>> transactions = getAccTransactions(accountid);
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("transactions", transactions);
+        return new ModelAndView("transactions.hbs", model);
+    }
+
+    public ArrayList<Map<String, Object>> getAccTransactions(String id) {
         ArrayList<Map<String, Object>> transactions = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             String query = ("SELECT * FROM `Transactions` WHERE `To` = ? OR `From` = ?"); //transaction is relevant to account
             PreparedStatement ps = connection.prepareStatement(query);
-            ps.setString(1, accountid);
-            ps.setString(2, accountid);
+            ps.setString(1, id);
+            ps.setString(2, id);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -119,10 +125,9 @@ public class Controller {
             logger.error("Error in database", e);
         }
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("transactions", transactions);
-        return new ModelAndView("transactions.hbs", model);
+        return transactions;
     }
+
 
     @GET("/login")
     public ModelAndView loginPage(Context ctx) {
@@ -220,4 +225,31 @@ public class Controller {
         }
     }
 
+    @GET("/{id}/summary")
+    public ModelAndView summaryOfSpending(Context ctx) {
+        String id = ctx.path("id").value();
+        HashMap<String, Double> summary = new HashMap<>();
+        ArrayList<Map<String, Object>> transactions = getAccTransactions(id);
 
+        for (int i = 0; i < transactions.size(); i++) {
+            if (Objects.equals(transactions.get(i).get("type").toString(), "PAYMENT")) {
+                String businessID = transactions.get(i).get("to").toString();
+
+                // Assuming Businesses is a class that provides business categories by business ID.
+                String category = Businesses.getBusinessByID(businessID).getCategory();
+
+                if (summary.get(category) == null) {
+                    summary.put(category, (Double) transactions.get(i).get("amount"));
+                } else {
+                    summary.replace(category, summary.get(category) + (Double) transactions.get(i).get("amount"));
+                }
+            }
+        }
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("summary", summary);  // Passing the summary data to the view.
+        return new ModelAndView("summary.hbs", model);  // Rendering the summary view.
+    }
+
+
+}

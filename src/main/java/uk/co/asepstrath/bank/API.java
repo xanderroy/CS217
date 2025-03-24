@@ -1,6 +1,6 @@
 package uk.co.asepstrath.bank;
 
-
+import com.typesafe.config.ConfigException;
 import io.jooby.StatusCode;
 import io.jooby.exception.StatusCodeException;
 import kong.unirest.core.HttpResponse;
@@ -9,10 +9,19 @@ import kong.unirest.core.Unirest;
 import kong.unirest.core.json.JSONArray;
 
 import javax.sql.DataSource;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.sql.*;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Scanner;
 
 import kong.unirest.core.json.JSONObject;
 import org.slf4j.Logger;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class API {
 
@@ -104,6 +113,8 @@ public class API {
                         ps.setString(4, to);
                         ps.setString(5, from);
 
+                        Transactions.addTransaction(new Transaction(id, to, from, type, amount));
+
                         ps.executeUpdate();
                     } catch (Exception e) {
                         log.error("Exception", e);
@@ -113,6 +124,30 @@ public class API {
                 log.error("Transaction database error", e);
             }
         }
+    }
+
+    public void getBusinesses() {
+
+        HttpResponse<File> response = Unirest.get("https://api.asep-strath.co.uk/api/businesses").asFile("businesses.csv", REPLACE_EXISTING);
+
+        File file = response.getBody();
+
+        try(Scanner sc = new Scanner(file)) {
+            while (sc.hasNext()) {
+                String line = sc.nextLine();
+
+                String tokens[] = line.split(",");
+
+                try {
+                    Businesses.addBusiness(tokens[0], tokens[1], tokens[2], (Objects.equals(tokens[3], "true")));
+                } catch (IndexOutOfBoundsException e) {
+                    log.error("CSV format not as expected", e);
+                }
+            }
+        } catch (FileNotFoundException e){
+            log.error("Businesses file could not be created", e);
+        }
+
     }
 
     public void applyTransactions() {

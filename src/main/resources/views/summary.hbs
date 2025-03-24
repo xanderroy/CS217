@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>User Details</title>
+    <title>Summary of Spending</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,56 +23,34 @@
             padding: 10px;
             border-radius: 5px;
         }
-        .details {
+        .summary {
             text-align: left;
             margin-top: 20px;
             font-size: 18px;
         }
-        .details p {
+        .summary p {
             background-color: #f2f2f2;
             padding: 10px;
             border-radius: 5px;
-        }
-        a {
-            background-color: #f2f2f2;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            display: inline-block;
         }
         .error {
             color: red;
             font-weight: bold;
         }
-        button {
-            width: 50%;
-            padding: 20px;
-            color: black;
-            border-radius: 4px;
-            font-size: 10px;
-        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>User Details</h1>
-    {{#if error}}
-        <p class="error">{{error}}</p>
-    {{else}}
-        <div class="details">
-            <p><strong>ID:</strong> {{id}}</p>
-            <p><strong>Name:</strong> {{name}}</p>
-            <p><strong>Balance:</strong> £{{balance}}</p>
-            <p><strong>Round Up:</strong> {{roundup}}</p>
+    <h1>Summary of Spending</h1>
+    {{#if summary}}
+        <div class="summary">
+            {{#each summary}}
+                <p><strong>{{@key}}:</strong> £{{this}}</p>
+            {{/each}}
         </div>
-        <a href="/bank/{{id}}/transactions">View Transactions</a><br>
-        <a href="/bank/{{id}}/summary">View Summary</a>
+    {{else}}
+        <p>No spending data available.</p>
     {{/if}}
 </div>
-<script>
-    function logout() {
-        
-    }
-</script>
 </body>
 </html>
