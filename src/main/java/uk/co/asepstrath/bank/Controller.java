@@ -22,7 +22,6 @@ public class Controller {
     }
     @GET("/")
     public ModelAndView homepage() {
-        // You can add any models here if you need dynamic content on the homepage
         return new ModelAndView("homepage.hbs", null);
     }
 
