@@ -1,5 +1,6 @@
 package uk.co.asepstrath.bank;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -25,20 +26,15 @@ public class Businesses {
         return null;
     }
 
-    public static HashMap<String, Double> sanctionedBusinesses() {
-        HashMap<String, Double> map = new HashMap<>();
+    public static ArrayList<ArrayList<String>> sanctionedBusinesses() {
+        ArrayList<ArrayList<String>> list = new ArrayList<>();
         for (Transaction t : Transactions.getAllTrans()) {
             if (t.getType().equals("PAYMENT")) {
                 if (Businesses.getBusinessByID(t.getTo()).isSanctioned()) {
-                    if (map.containsKey(t.getTo())) {
-                        map.put(t.getTo(), map.get(t.getTo()) + t.getAmount()); //sorry for the indentation
-                    }
-                    else {
-                        map.put(t.getTo(), t.getAmount());
-                    }
+                    list.add(Transactions.getTransDetails(t.getId()));
                 }
             }
         }
-        return map;
+        return list;
     }
 }

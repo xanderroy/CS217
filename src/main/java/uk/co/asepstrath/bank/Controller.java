@@ -214,10 +214,10 @@ public class Controller {
     }
 
     @GET("/report")
-    public HashMap<String, Double> sanctionReport() {
-        HashMap<String, Double> map = Businesses.sanctionedBusinesses();
+    public ArrayList<ArrayList<String>> sanctionReport() {
+        ArrayList<ArrayList<String>> list = Businesses.sanctionedBusinesses();
 
-        return map;
+        return list;
     }
 
 }
