@@ -7,6 +7,7 @@ import io.jooby.Registry;
 import io.jooby.StatusCode;
 import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
+import org.h2.engine.Mode;
 import org.slf4j.Logger;
 import javax.sql.DataSource;
 import java.io.UnsupportedEncodingException;
@@ -134,6 +135,7 @@ public class Controller {
         } else if(userId.equals("admin")){
             ctx.sendRedirect("/bank/accounts");
             isAdmin = true;
+            isLoggedIn = true;
             currentUserId = userId;
         }
         userId = userId.trim();
@@ -169,6 +171,19 @@ public class Controller {
             return new ModelAndView("login.hbs", model);
         }
         return new ModelAndView("login.hbs", null);
+    }
+
+    @GET("/logout")
+    public ModelAndView logout() {
+        Map<String, String> model = new HashMap<>();
+        if (isLoggedIn) {
+            isAdmin = false;
+            isLoggedIn = false;
+            currentUserId = null;
+            return new ModelAndView("logout.hbs", null);
+        }
+        model.put("error", "Not logged in");
+        return new ModelAndView("logout.hbs", model);
     }
 
 
