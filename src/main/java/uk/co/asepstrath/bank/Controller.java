@@ -23,7 +23,7 @@ public class Controller {
     private final Logger logger;
     private boolean isAdmin = false;
     private boolean isLoggedIn = false;
-    private String currentUserId;
+    private String currentUserId = "";
 
     public Controller(DataSource ds, Logger log) {
         dataSource = ds;
@@ -179,7 +179,7 @@ public class Controller {
         if (isLoggedIn) {
             isAdmin = false;
             isLoggedIn = false;
-            currentUserId = null;
+            currentUserId = "";
             return new ModelAndView("logout.hbs", null);
         }
         model.put("error", "Not logged in");
