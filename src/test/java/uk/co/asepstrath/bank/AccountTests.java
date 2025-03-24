@@ -101,4 +101,14 @@ public class AccountTests {
         Assertions.assertNull(b);
     }
 
+    @Test
+    public void testRoundUps() {
+        Account a = new Account("Stephen", 100, false, "id1");
+        Accounts.addAccount(a);
+        Transactions.addTransaction(new Transaction("tr1", "KFC", "id1", "PAYMENT", 9.50));
+        Accounts.getAccount("id1").enableRoundUps();
+        Assertions.assertEquals(90, Accounts.getAccount("id1").getBalance());
+        Assertions.assertEquals(0.5, Accounts.getAccount("id1").getRoundUpsPot());
+    }
+
 }
