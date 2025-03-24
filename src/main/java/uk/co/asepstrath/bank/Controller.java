@@ -223,7 +223,6 @@ public class Controller {
                 return new ModelAndView("transactionDetails.hbs", model);
             }
         }
-    }
 
     @GET("/{id}/summary")
     public ModelAndView summaryOfSpending(Context ctx) {
@@ -250,6 +249,5 @@ public class Controller {
         model.put("summary", summary);  // Passing the summary data to the view.
         return new ModelAndView("summary.hbs", model);  // Rendering the summary view.
     }
-
-
 }
+
