@@ -1,6 +1,8 @@
 package uk.co.asepstrath.bank;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class Businesses {
@@ -22,5 +24,17 @@ public class Businesses {
         }
 
         return null;
+    }
+
+    public static ArrayList<ArrayList<String>> sanctionedBusinesses() {
+        ArrayList<ArrayList<String>> list = new ArrayList<>();
+        for (Transaction t : Transactions.getAllTrans()) {
+            if (t.getType().equals("PAYMENT")) {
+                if (Businesses.getBusinessByID(t.getTo()).isSanctioned()) {
+                    list.add(Transactions.getTransDetails(t.getId()));
+                }
+            }
+        }
+        return list;
     }
 }

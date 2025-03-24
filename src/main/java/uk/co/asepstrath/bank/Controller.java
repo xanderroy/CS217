@@ -249,5 +249,13 @@ public class Controller {
         model.put("summary", summary);  // Passing the summary data to the view.
         return new ModelAndView("summary.hbs", model);  // Rendering the summary view.
     }
+
+    @GET("/report")
+    public ArrayList<ArrayList<String>> sanctionReport() {
+        ArrayList<ArrayList<String>> list = Businesses.sanctionedBusinesses();
+
+        return list;
+    }
+
 }
 
