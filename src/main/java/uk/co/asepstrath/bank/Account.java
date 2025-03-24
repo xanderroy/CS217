@@ -9,6 +9,7 @@ public class Account {
     private String name;
     private Boolean roundUp = false;
     private String id;
+    private BigDecimal roundUpsPot = new BigDecimal(0);
 
     Account() {
 
@@ -32,7 +33,7 @@ public class Account {
 
     public void deposit(double amount) {
         BigDecimal toAdd = new BigDecimal(amount);
-        balance = balance.add(toAdd);
+        this.balance = balance.add(toAdd);
     }
 
     public double getBalance() {
@@ -41,11 +42,12 @@ public class Account {
 
     public void withdraw(double amount) {
         BigDecimal toSub = new BigDecimal(amount);
-        balance = balance.subtract(toSub);
+        this.balance = balance.subtract(toSub);
     }
 
     public void enableRoundUps() {
-        this.roundUp = true;
+        roundUp = true;
+        API.applyTransactions();
     }
 
     public String getName() {
@@ -61,9 +63,7 @@ public class Account {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public void setId(String id) { this.id = id; }
 
     public Boolean getRoundUp() {
         return roundUp;
@@ -71,5 +71,18 @@ public class Account {
 
     public void setRoundUp(Boolean roundUp) {
         this.roundUp = roundUp;
+        API.applyTransactions();
+    }
+
+    public double getRoundUpsPot() {
+        return roundUpsPot.doubleValue();
+    }
+
+    public void setRoundUpsPot(double roundUpsPot) {
+        this.roundUpsPot = (new BigDecimal(roundUpsPot));
+    }
+
+    public void addRoundUps(double amount) {
+        this.roundUpsPot = roundUpsPot.add(new BigDecimal(amount));
     }
 }

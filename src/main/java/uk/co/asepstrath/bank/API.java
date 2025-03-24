@@ -150,42 +150,33 @@ public class API {
 
     }
 
-    public void applyTransactions() {
-        String transactionsQuery = "SELECT * FROM `Transactions`";
-
-        try (Connection connection = ds.getConnection();
-             PreparedStatement tps = connection.prepareStatement(transactionsQuery);
-        ) {
-            ResultSet trs = tps.executeQuery();
-
-            double balance = 0;
-
-            while (trs.next()) {
-                switch(trs.getString("Type")) {
-                    case "DEPOSIT":
-                        Accounts.getAccount(trs.getString("To")).deposit(trs.getDouble("Amount"));
-                        break;
-                    case "WITHDRAWAL":
-                        Accounts.getAccount(trs.getString("From")).withdraw(trs.getDouble("Amount"));
-                        break;
-                    case "TRANSFER":
-                        Accounts.getAccount(trs.getString("To")).deposit(trs.getDouble("Amount"));
-                        Accounts.getAccount(trs.getString("From")).withdraw(trs.getDouble("Amount"));
-                        break;
-                    case "PAYMENT":
-                        Accounts.getAccount(trs.getString("From")).withdraw(trs.getDouble("Amount"));
-                        break;
-                    case "ROUNDUP":
-                        //nothing for now
-                        break;
-                    default:
-                        log.error("Error in processing transactions, unknown transaction type.");
-                }
+    public static void applyTransactions() {
+        for (Transaction t : Transactions.getAllTrans()) {
+            switch(t.getType()) {
+                case "DEPOSIT":
+                    Accounts.getAccount(t.getTo()).deposit(t.getAmount());
+                    break;
+                case "WITHDRAWAL":
+                    Accounts.getAccount(t.getFrom()).withdraw(t.getAmount());
+                    break;
+                case "TRANSFER":
+                    Accounts.transfer(t.getTo(), t.getFrom(), t.getAmount());
+                    break;
+                case "PAYMENT":
+                    if (Accounts.getAccount(t.getFrom()).getRoundUp()) {
+                        Accounts.getAccount(t.getFrom()).withdraw(Math.ceil(t.getAmount()));
+                        Accounts.getAccount(t.getFrom()).addRoundUps(Math.ceil(t.getAmount()) - t.getAmount());
+                    }
+                    else {
+                        Accounts.getAccount(t.getFrom()).withdraw(t.getAmount());
+                    }
+                    break;
+                case "ROUNDUP":
+                    //nothing for now
+                    break;
+                default:
+                    System.out.println("Error in processing transactions, unknown transaction type.");
             }
-
-        } catch (Exception e) {
-            log.error("Error in processing Transactions", e);
-            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
         }
     }
 }
