@@ -39,18 +39,15 @@
 </head>
 <body>
 <div class="container">
-    <h1> Bank Login</h1>
+    <h1> Bank Logout </h1>
 </div>
 <div class="container">
-    <h2>Login</h2>
+    <h2>Logout</h2>
         {{#if error}}
-        <p class="error">{{error}}</p>
+            <p class="error">{{error}}</p>
+        {{else}}
+            <p>Logged out</p>
         {{/if}}
-    <form action="/bank/login" method="GET">
-        <label for="userId">Enter UserID</label><br><br>
-        <input type="text" id="userId" name="userId" placeholder="Enter UserID" required><br><br>
-        <button type="submit">Login</button>
-    </form>
 </div>
 </body>
 </html>
