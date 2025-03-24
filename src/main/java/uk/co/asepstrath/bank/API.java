@@ -113,6 +113,8 @@ public class API {
                         ps.setString(4, to);
                         ps.setString(5, from);
 
+                        Transactions.addTransaction(new Transaction(id, to, from, type, amount));
+
                         ps.executeUpdate();
                     } catch (Exception e) {
                         log.error("Exception", e);
