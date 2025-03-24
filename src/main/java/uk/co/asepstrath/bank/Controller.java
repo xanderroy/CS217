@@ -213,4 +213,11 @@ public class Controller {
         return summary;
     }
 
+    @GET("/report")
+    public HashMap<String, Double> sanctionReport() {
+        HashMap<String, Double> map = Businesses.sanctionedBusinesses();
+
+        return map;
+    }
+
 }

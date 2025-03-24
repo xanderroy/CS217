@@ -172,7 +172,7 @@ public class API {
                     }
                     break;
                 case "ROUNDUP":
-                    //nothing for now
+                    Accounts.getAccount(t.getTo()).deposit(Accounts.getAccount(t.getTo()).getRoundUpsPot());
                     break;
                 default:
                     System.out.println("Error in processing transactions, unknown transaction type.");
