@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: white;
+            height: 100vh;
+            padding-top: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            border-bottom: 1px solid gray;
+        }
+        .container {
+            margin-left: 260px;
+            padding: 20px;
+            width: 80%;
+        }
+        h1 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <a href="/bank/accounts">Accounts</a>
+    <a href="/bank/{{id}}">User Details</a>
+    <a href="/bank/{{id}}/transactions">Transactions</a>
+    <a href="/bank/logout">Logout</a>
+</div>
+<div class="container">
+    <h1>Admin Dashboard</h1>
+    {{{body}}}
+</div>
+</body>
+</html>

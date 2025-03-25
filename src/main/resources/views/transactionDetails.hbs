@@ -76,10 +76,29 @@
         a:hover {
             background-color: #0056b3;
         }
+
+        .go-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50; /* Same color as in the provided code */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .go-back:hover {
+            background-color: #45a049; /* Hover effect */
+        }
+
     </style>
 </head>
 <body>
 <div class="container">
+    <!-- Go Back Button -->
+    <a href="javascript:history.back()" class="go-back">Go Back</a>
     <h1>Transaction Details</h1>
     {{#if error}}
         <p class="error">{{error}}</p>

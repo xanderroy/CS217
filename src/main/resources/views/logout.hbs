@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
+    <title>Logout</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,27 +27,36 @@
             color: red;
             font-weight: bold;
         }
-
-         button {
-            width: 50%;
-            padding: 20px;
-            color: black;
-            border-radius: 4px;
-            font-size: 10px;
+        .home-box {
+            display: inline-block;
+            width: 200px;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .home-box:hover {
+            background-color: #388E3C;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1> Bank Logout </h1>
+    <h1>Bank Logout</h1>
 </div>
 <div class="container">
     <h2>Logout</h2>
-        {{#if error}}
-            <p class="error">{{error}}</p>
-        {{else}}
-            <p>Logged out</p>
-        {{/if}}
+    {{#if error}}
+        <p class="error">{{error}}</p>
+    {{else}}
+        <p>Logged out</p>
+    {{/if}}
+    <div class="home-box" onclick="location.href='/bank/'">Go to Homepage</div>
 </div>
 </body>
 </html>

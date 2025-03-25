@@ -5,7 +5,6 @@ import io.jooby.ModelAndView;
 import io.jooby.StatusCode;
 import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
-import org.h2.engine.Mode;
 import org.slf4j.Logger;
 import javax.sql.DataSource;
 import java.sql.*;
@@ -23,6 +22,15 @@ public class Controller {
         dataSource = ds;
         logger = log;
     }
+
+    public Controller(DataSource ds, Logger log, boolean isAdmin, boolean isLoggedIn, String currentUserId) {
+        this.dataSource = ds;
+        this.logger = log;
+        this.isAdmin = isAdmin;
+        this.isLoggedIn = isLoggedIn;
+        this.currentUserId = currentUserId;
+    }
+
     @GET("/")
     public ModelAndView homepage() {
         return new ModelAndView("homepage.hbs", null);
@@ -63,7 +71,7 @@ public class Controller {
         String userId = ctx.path("id").value(); //sets the id from url as a string
         Map<String, Object> model = new HashMap<>();
         if(!(currentUserId.equals(userId) || isAdmin)){
-            model.put("error", "Invalid UserID.");
+            model.put("error", "Forbidden. Please log in.");
             return new ModelAndView("userDetails.hbs", model);
         }else{
             try (Connection connection = dataSource.getConnection()) {
@@ -89,18 +97,26 @@ public class Controller {
                 throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
                 // And return a HTTP 500 error to the requester
             }
-            return new ModelAndView("userDetails.hbs", model);
+            return new ModelAndView("user.hbs", model);
         }
     }
+
 
     @GET("/{id}/transactions")
     public ModelAndView AllTransAcc(Context ctx) {
         String accountid = ctx.path("id").value();
-        ArrayList<Map<String, Object>> transactions = getAccTransactions(accountid);
+        if (currentUserId.equals(accountid) || isAdmin) {
+            ArrayList<Map<String, Object>> transactions = getAccTransactions(accountid);
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("transactions", transactions);
-        return new ModelAndView("transactions.hbs", model);
+            Map<String, Object> model = new HashMap<>();
+            model.put("transactions", transactions);
+            return new ModelAndView("transactions.hbs", model);
+        }
+        else {
+            Map<String, Object> model = new HashMap<>();
+            model.put("error", "Forbidden. Please log in.");
+            return new ModelAndView("transactions.hbs", model);
+        }
     }
 
     public ArrayList<Map<String, Object>> getAccTransactions(String id) {
@@ -216,8 +232,8 @@ public class Controller {
                 logger.error("Database Error Occurred", e);
                 throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
             }
-            if(!(currentUserId.equals(model.get("to")) || currentUserId.equals(model.get("from")))){
-                model.put("error", "Invalid TransactionID.");
+            if((!currentUserId.equals(model.get("to")) && !currentUserId.equals(model.get("from"))) && !currentUserId.equals("admin")){
+                model.put("error", "Forbidden. Please log in.");
                 return new ModelAndView("transactionDetails.hbs", model);
             } else {
                 return new ModelAndView("transactionDetails.hbs", model);
@@ -227,34 +243,42 @@ public class Controller {
     @GET("/{id}/summary")
     public ModelAndView summaryOfSpending(Context ctx) {
         String id = ctx.path("id").value();
-        HashMap<String, Double> summary = new HashMap<>();
-        ArrayList<Map<String, Object>> transactions = getAccTransactions(id);
+        if (isAdmin || currentUserId.equals(id)) {
+            HashMap<String, Double> summary = new HashMap<>();
+            ArrayList<Map<String, Object>> transactions = getAccTransactions(id);
 
-        for (int i = 0; i < transactions.size(); i++) {
-            if (Objects.equals(transactions.get(i).get("type").toString(), "PAYMENT")) {
-                String businessID = transactions.get(i).get("to").toString();
+            for (int i = 0; i < transactions.size(); i++) {
+                if (Objects.equals(transactions.get(i).get("type").toString(), "PAYMENT")) {
+                    String businessID = transactions.get(i).get("to").toString();
 
-                // Assuming Businesses is a class that provides business categories by business ID.
-                String category = Businesses.getBusinessByID(businessID).getCategory();
+                    // Assuming Businesses is a class that provides business categories by business ID.
+                    String category = Businesses.getBusinessByID(businessID).getCategory();
 
-                if (summary.get(category) == null) {
-                    summary.put(category, (Double) transactions.get(i).get("amount"));
-                } else {
-                    summary.replace(category, summary.get(category) + (Double) transactions.get(i).get("amount"));
+                    if (summary.get(category) == null) {
+                        summary.put(category, (Double) transactions.get(i).get("amount"));
+                    } else {
+                        summary.replace(category, summary.get(category) + (Double) transactions.get(i).get("amount"));
+                    }
                 }
             }
-        }
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("summary", summary);  // Passing the summary data to the view.
-        return new ModelAndView("summary.hbs", model);  // Rendering the summary view.
+            Map<String, Object> model = new HashMap<>();
+            model.put("summary", summary);  // Passing the summary data to the view.
+            return new ModelAndView("summary.hbs", model);  // Rendering the summary view.
+        }
+        Map<String, String> model = new HashMap<>();
+        model.put("error", "Forbidden. Please log in");
+        return new ModelAndView("summary.hbs", model);
     }
 
     @GET("/report")
     public ArrayList<ArrayList<String>> sanctionReport() {
-        ArrayList<ArrayList<String>> list = Businesses.sanctionedBusinesses();
+        if (isAdmin) {
+            ArrayList<ArrayList<String>> list = Businesses.sanctionedBusinesses();
 
-        return list;
+            return list;
+        }
+        return new ArrayList<ArrayList<String>>(); //null variable (change later)
     }
 
 }
