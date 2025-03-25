@@ -22,6 +22,15 @@ public class Controller {
         dataSource = ds;
         logger = log;
     }
+
+    public Controller(DataSource ds, Logger log, boolean isAdmin, boolean isLoggedIn, String currentUserId) {
+        this.dataSource = ds;
+        this.logger = log;
+        this.isAdmin = isAdmin;
+        this.isLoggedIn = isLoggedIn;
+        this.currentUserId = currentUserId;
+    }
+
     @GET("/")
     public ModelAndView homepage() {
         return new ModelAndView("homepage.hbs", null);
