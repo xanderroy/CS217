@@ -1,8 +1,6 @@
 package uk.co.asepstrath.bank;
 
-import com.typesafe.config.ConfigException;
-import io.jooby.StatusCode;
-import io.jooby.exception.StatusCodeException;
+import com.google.gson.Gson;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
@@ -12,13 +10,14 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.sql.*;
+import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 
 import kong.unirest.core.json.JSONObject;
+import okhttp3.*;
 import org.slf4j.Logger;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -33,9 +32,32 @@ public class API {
         this.log = log;
     }
 
+    public String getOauthToken() {
+        String token;
+
+        RequestBody formbody = new FormBody.Builder().add("grant_type", "client_credentials").build();
+
+        Request req = new Request.Builder().url("https://api.asep-strath.co.uk/oauth2/token").post(formbody)
+                .addHeader("Authorization", Credentials.basic("scotbank", "this1password2is3not4secure")).build();
+
+        try (Response rep = new OkHttpClient().newCall(req).execute()) {
+            String tokenjson = rep.body().string();
+            String tokens[] = tokenjson.split(",");
+            tokens[0] = tokens[0].replace("{\"access_token\":\"", "");
+            tokens[0] = tokens[0].replace("\"", "");
+            token = tokens[0];
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return token;
+    }
+
 
     public void getAccounts() {
-        HttpResponse<JsonNode> response = Unirest.get("https://api.asep-strath.co.uk/api/accounts").asJson();
+        String token = getOauthToken();
+
+        HttpResponse<JsonNode> response = Unirest.get("https://api.asep-strath.co.uk/api/accounts?include=postcode").
+                header("Authorization", "Bearer " + token).asJson();
         JSONArray arr = response.getBody().getArray();
 
         try (Connection connection = ds.getConnection()) {
@@ -51,8 +73,9 @@ public class API {
                 String name = thisobj.getString("name");
                 double balance = thisobj.getDouble("startingBalance");
                 boolean roundup = thisobj.getBoolean("roundUpEnabled");
+                String postcode = thisobj.getString("postcode");
 
-                Accounts.addAccount(id, balance, roundup, name); //add the account to accounts list
+                Accounts.addAccount(new Account(name, balance, roundup, id, postcode)); //add the account to accounts list
 
                 ps.setString(1, id);
                 ps.setString(2, name);
@@ -170,6 +193,7 @@ public class API {
                     else {
                         Accounts.getAccount(t.getFrom()).withdraw(t.getAmount());
                     }
+                    Accounts.getAccount(t.getFrom()).addTotalSpending(t.getAmount());
                     break;
                 case "ROUNDUP":
                     Accounts.getAccount(t.getTo()).deposit(Accounts.getAccount(t.getTo()).getRoundUpsPot());

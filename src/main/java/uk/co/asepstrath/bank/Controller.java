@@ -281,5 +281,37 @@ public class Controller {
         return new ArrayList<ArrayList<String>>(); //null variable (change later)
     }
 
+    @GET("/bigspenders")
+    public ArrayList<ArrayList<String>> bigSpenders() {
+        if (isAdmin) {
+            ArrayList<ArrayList<String>> details = new ArrayList<>();
+
+            double highestSpending;
+            String highestSpender = "shut up java";
+            ArrayList<String> highestSpenders = new ArrayList<>();
+
+            while (highestSpenders.size() != 10) {
+                highestSpending = 0;
+                for (Account a : Accounts.accounts) {
+                    if (!highestSpenders.contains(a.getId())) {
+                        if (a.getTotalSpending() > highestSpending) {
+                            highestSpending = a.getTotalSpending();
+                            highestSpender = a.getId();
+                        }
+                    }
+                }
+                if (!highestSpenders.contains(highestSpender))
+                    highestSpenders.add(highestSpender);
+            }
+
+            for (String s : highestSpenders) {
+                details.add(new ArrayList<>(Arrays.asList(Accounts.getAccount(s).getPostcode(),
+                        Accounts.getAccount(s).getName(), String.valueOf(Accounts.getAccount(s).getTotalSpending()))));
+            }
+            return details;
+        }
+        return new ArrayList<>();
+    }
+
 }
 
