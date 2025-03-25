@@ -6,24 +6,54 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            text-align: center;
-            padding: 50px;
+            margin: 0;
+            display: flex;
         }
 
-        .container {
-            width: 80%;
-            margin: auto;
-            background-color: white;
+        /* Left Sidebar Styling */
+        .sidebar {
+            width: 220px;
+            background-color: #4CAF50; /* Green background */
+            color: white;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            height: 100vh; /* Full height */
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #388E3C; /* Darker green for the button */
+        }
+
+        .sidebar a:hover {
+            background-color: #2E7D32; /* Darker hover effect */
+        }
+
+        .sidebar .logout {
+            background-color: red !important; /* Red logout button */
+        }
+
+        /* Main Content */
+        .container {
+            margin-left: 240px; /* Shift content right to make space for sidebar */
+            padding: 20px;
+            width: 100%;
+            text-align: center;
         }
 
         h1 {
             background-color: #4CAF50;
             color: white;
-            padding: 10px;
+            padding: 15px;
             border-radius: 5px;
+            display: inline-block;
         }
 
         table {
@@ -38,7 +68,7 @@
         }
 
         th {
-            background-color: #4CAF50;
+            background-color: #388E3C; /* Darker green for contrast */
             color: white;
         }
 
@@ -47,12 +77,12 @@
         }
 
         tr:hover {
-            background-color: #ddd;
+            background-color: #c8e6c9; /* Soft green hover effect */
         }
 
         a {
             text-decoration: none;
-            color: #4CAF50;
+            color: #388E3C; /* Darker green for links */
         }
 
         a:hover {
@@ -61,6 +91,11 @@
     </style>
 </head>
 <body>
+<div class="sidebar">
+    <a href="/bank/report">View Sanction Report</a>
+    <a href="/bank/bigspenders">View Big Spenders</a>
+    <a class="logout" href="/bank/logout">Logout</a>
+</div>
 <div class="container">
     <h1>Accounts List</h1>
     <table>
@@ -68,7 +103,7 @@
         <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Balance</th>
+            <th>Starting Balance</th>
             <th>Round Up</th>
         </tr>
         </thead>
@@ -76,7 +111,7 @@
         {{#each accounts}}
             <tr>
                 <td>{{id}}</td>
-                <td><a href="/bank/{{id}}">{{name}}</a></td> <!-- Link to the user details page -->
+                <td><a href="/bank/{{id}}">{{name}}</a></td>
                 <td>£{{balance}}</td>
                 <td>{{roundup}}</td>
             </tr>
@@ -84,5 +119,6 @@
         </tbody>
     </table>
 </div>
+
 </body>
 </html>

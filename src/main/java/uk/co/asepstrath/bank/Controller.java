@@ -68,38 +68,40 @@ public class Controller {
 
     @GET("/{id}")
     public ModelAndView UserDetails(Context ctx) {
-        String userId = ctx.path("id").value(); //sets the id from url as a string
+        String userId = ctx.path("id").value();
         Map<String, Object> model = new HashMap<>();
         if(!(currentUserId.equals(userId) || isAdmin)){
-            model.put("error", "Forbidden. Please log in.");
+            model.put("error", "Invalid UserID.");
             return new ModelAndView("userDetails.hbs", model);
-        }else{
+        } else {
             try (Connection connection = dataSource.getConnection()) {
                 String query = "SELECT * FROM Accounts WHERE ID = ?";
-                try (PreparedStatement statement = connection.prepareStatement(query)) { //using prepared statement to make sure the datatype it expects is correct
-                    statement.setString(1, userId); //puts the id into the query
+                try (PreparedStatement statement = connection.prepareStatement(query)) {
+                    statement.setString(1, userId);
                     ResultSet resultSet = statement.executeQuery();
 
-                    if (resultSet.next()) { //checks if there's an account with the matching id
+                    if (resultSet.next()) {
                         model.put("id", resultSet.getString("ID"));
                         model.put("name", resultSet.getString("Name"));
                         double balance = Accounts.getAccount(userId).getBalance();
                         model.put("balance", balance);
                         model.put("roundup", resultSet.getBoolean("RoundUp"));
                     } else {
-                        model.put("error", "User not found"); //returns error statement when no matching account is detected
+                        model.put("error", "User not found");
                     }
                 }
-
             } catch (SQLException e) {
                 logger.error("Database Error Occurred", e);
-                // If something does go wrong this will log the stack trace
                 throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
-                // And return a HTTP 500 error to the requester
             }
-            return new ModelAndView("user.hbs", model);
+            if (isAdmin) {
+                return new ModelAndView("userDetails.hbs", model);
+            } else {
+                return new ModelAndView("user.hbs", model);
+            }
         }
     }
+
 
 
     @GET("/{id}/transactions")
@@ -272,24 +274,26 @@ public class Controller {
     }
 
     @GET("/report")
-    public ArrayList<ArrayList<String>> sanctionReport() {
+    public ModelAndView sanctionReport() {
+        Map<String, Object> model = new HashMap<>();
+
         if (isAdmin) {
             ArrayList<ArrayList<String>> list = Businesses.sanctionedBusinesses();
-
-            return list;
+            model.put("sanctions", list);
+        } else {
+            model.put("sanctions", new ArrayList<>()); // Empty list if not admin
         }
-        return new ArrayList<ArrayList<String>>(); //null variable (change later)
+
+        return new ModelAndView("report.hbs", model);
     }
 
     @GET("/bigspenders")
-    public ArrayList<ArrayList<String>> bigSpenders() {
+    public ModelAndView bigSpenders() {
         if (isAdmin) {
             ArrayList<ArrayList<String>> details = new ArrayList<>();
-
             double highestSpending;
             String highestSpender = "shut up java";
             ArrayList<String> highestSpenders = new ArrayList<>();
-
             while (highestSpenders.size() != 10) {
                 highestSpending = 0;
                 for (Account a : Accounts.accounts) {
@@ -303,15 +307,24 @@ public class Controller {
                 if (!highestSpenders.contains(highestSpender))
                     highestSpenders.add(highestSpender);
             }
-
+            ArrayList<HashMap<String, String>> spenders = new ArrayList<>();
             for (String s : highestSpenders) {
-                details.add(new ArrayList<>(Arrays.asList(Accounts.getAccount(s).getPostcode(),
-                        Accounts.getAccount(s).getName(), String.valueOf(Accounts.getAccount(s).getTotalSpending()))));
+                HashMap<String, String> spender = new HashMap<>();
+                spender.put("postcode", Accounts.getAccount(s).getPostcode());
+                spender.put("name", Accounts.getAccount(s).getName());
+                spender.put("totalSpending", String.valueOf(Accounts.getAccount(s).getTotalSpending()));
+                spenders.add(spender);
             }
-            return details;
+            HashMap<String, Object> model = new HashMap<>();
+            model.put("spenders", spenders);
+            return new ModelAndView("bigSpenders.hbs", model);
         }
-        return new ArrayList<>();
+        HashMap<String, Object> errorModel = new HashMap<>();
+        errorModel.put("message", "Unauthorized access.");
+        return new ModelAndView("error", errorModel);
     }
+
+
 
 }
 

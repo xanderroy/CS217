@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Big Spenders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+
+        table {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #388E3C;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #c8e6c9;
+        }
+
+        h1 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .go-back {
+            margin-bottom: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .go-back:hover {
+            background-color: #388E3C;
+        }
+    </style>
+</head>
+<body>
+
+<a href="/bank/accounts" class="go-back">Go Back</a>
+
+<h1>Big Spenders</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Postcode</th>
+        <th>Name</th>
+        <th>Total Spending</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each spenders}}
+        <tr>
+            <td>{{postcode}}</td>
+            <td>{{name}}</td>
+            <td>£{{totalSpending}}</td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+</body>
+</html>
