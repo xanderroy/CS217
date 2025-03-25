@@ -5,7 +5,6 @@ import io.jooby.ModelAndView;
 import io.jooby.StatusCode;
 import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
-import org.h2.engine.Mode;
 import org.slf4j.Logger;
 import javax.sql.DataSource;
 import java.sql.*;
@@ -60,37 +59,41 @@ public class Controller {
 
     @GET("/{id}")
     public ModelAndView UserDetails(Context ctx) {
-        String userId = ctx.path("id").value(); //sets the id from url as a string
+        String userId = ctx.path("id").value();
         Map<String, Object> model = new HashMap<>();
-        if(!(currentUserId.equals(userId) || isAdmin)){
+
+        if (!(currentUserId.equals(userId) || isAdmin)) {
             model.put("error", "Invalid UserID.");
             return new ModelAndView("userDetails.hbs", model);
-        }else{
+        } else {
             try (Connection connection = dataSource.getConnection()) {
                 String query = "SELECT * FROM Accounts WHERE ID = ?";
-                try (PreparedStatement statement = connection.prepareStatement(query)) { //using prepared statement to make sure the datatype it expects is correct
-                    statement.setString(1, userId); //puts the id into the query
+                try (PreparedStatement statement = connection.prepareStatement(query)) {
+                    statement.setString(1, userId);
                     ResultSet resultSet = statement.executeQuery();
-
-                    if (resultSet.next()) { //checks if there's an account with the matching id
+                    if (resultSet.next()) {
                         model.put("id", resultSet.getString("ID"));
                         model.put("name", resultSet.getString("Name"));
                         double balance = Accounts.getAccount(userId).getBalance();
                         model.put("balance", balance);
                         model.put("roundup", resultSet.getBoolean("RoundUp"));
+
+                        // chheck if the user is an admin or a normal user
+                        if (isAdmin) {
+                            return new ModelAndView("admin.hbs", model);
+                        } else {
+                            return new ModelAndView("user.hbs", model);
+                        }
                     } else {
-                        model.put("error", "User not found"); //returns error statement when no matching account is detected
+                        model.put("error", "User not found");
                     }
                 }
-
             } catch (SQLException e) {
                 logger.error("Database Error Occurred", e);
-                // If something does go wrong this will log the stack trace
                 throw new StatusCodeException(StatusCode.SERVER_ERROR, "Database Error Occurred");
-                // And return a HTTP 500 error to the requester
             }
-            return new ModelAndView("userDetails.hbs", model);
         }
+        return new ModelAndView("userDetails.hbs", model);
     }
 
     @GET("/{id}/transactions")

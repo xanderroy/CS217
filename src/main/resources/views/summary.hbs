@@ -3,6 +3,21 @@
 <head>
     <title>Summary of Spending</title>
     <style>
+        .go-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50; /* Same color as before */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .go-back:hover {
+            background-color: #45a049; /* Hover effect */
+        }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -40,6 +55,8 @@
     </style>
 </head>
 <body>
+<a href="javascript:history.back()" class="go-back">Go Back</a>
+
 <div class="container">
     <h1>Summary of Spending</h1>
     {{#if summary}}
