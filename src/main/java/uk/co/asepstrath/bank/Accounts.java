@@ -11,7 +11,7 @@ public class Accounts {
     }
 
     public static void addAccount(String id, double balance, boolean roundup, String name) {
-        accounts.add(new Account(id, balance, roundup, id));
+        accounts.add(new Account(id, balance, roundup, name));
     }
 
     public static void transfer(String to, String from, double amount) {

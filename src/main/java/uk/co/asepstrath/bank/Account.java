@@ -10,6 +10,9 @@ public class Account {
     private Boolean roundUp = false;
     private String id;
     private BigDecimal roundUpsPot = new BigDecimal(0);
+    private String postcode;
+    private String cardDetails;
+    private BigDecimal totalSpending = new BigDecimal(0);
 
     Account() {
 
@@ -29,6 +32,23 @@ public class Account {
         this.name = name;
         this.roundUp = r;
         this.id = id;
+    }
+
+    Account(String name, double b, boolean r, String id, String postcode) {
+        this.balance = new BigDecimal(b);
+        this.name = name;
+        this.roundUp = r;
+        this.id = id;
+        this.postcode = postcode;
+    }
+
+    Account(String name, double b, boolean r, String id, String postcode, String cardDetails) {
+        this.balance = new BigDecimal(b);
+        this.name = name;
+        this.roundUp = r;
+        this.id = id;
+        this.postcode = postcode;
+        this.cardDetails = cardDetails;
     }
 
     public void deposit(double amount) {
@@ -84,5 +104,29 @@ public class Account {
 
     public void addRoundUps(double amount) {
         this.roundUpsPot = roundUpsPot.add(new BigDecimal(amount));
+    }
+
+    public String getPostcode() {
+        return postcode;
+    }
+
+    public void setPostcode(String postcode) {
+        this.postcode = postcode;
+    }
+
+    public String getCardDetails() {
+        return cardDetails;
+    }
+
+    public void setCardDetails(String cardDetails) {
+        this.cardDetails = cardDetails;
+    }
+
+    public double getTotalSpending() {
+        return totalSpending.doubleValue();
+    }
+
+    public void addTotalSpending(double amount) {
+        totalSpending = totalSpending.add(new BigDecimal(amount));
     }
 }
