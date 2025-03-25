@@ -129,4 +129,10 @@ public class Account {
     public void addTotalSpending(double amount) {
         totalSpending = totalSpending.add(new BigDecimal(amount));
     }
+
+    public void reclaimRoundUps() {
+        balance = balance.add(roundUpsPot);
+        roundUpsPot = roundUpsPot.subtract(roundUpsPot);
+    }
+
 }

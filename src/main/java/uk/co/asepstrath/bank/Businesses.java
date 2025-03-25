@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class Businesses {
-    private static ArrayList<Business> businesses = new ArrayList<>();
+    public static ArrayList<Business> businesses = new ArrayList<>();
 
     public static void addBusiness(Business b) {
         businesses.add(b);

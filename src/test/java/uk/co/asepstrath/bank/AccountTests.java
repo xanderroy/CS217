@@ -109,6 +109,8 @@ public class AccountTests {
         Accounts.getAccount("id1").enableRoundUps();
         Assertions.assertEquals(90, Accounts.getAccount("id1").getBalance());
         Assertions.assertEquals(0.5, Accounts.getAccount("id1").getRoundUpsPot());
+        Accounts.getAccount("id1").reclaimRoundUps();
+        Assertions.assertEquals(90.5, Accounts.getAccount("id1").getBalance());
     }
 
 }
