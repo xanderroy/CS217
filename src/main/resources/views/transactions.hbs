@@ -120,9 +120,14 @@
             {{/each}}
             </tbody>
         </table>
+    {{/if}}
+    {{#if error}}
+        <p>Forbidden, Please log in.</p>
     {{else}}
         <p class="no-transactions">No transactions found for this account.</p>
+
     {{/if}}
+
 </div>
 
 </body>
