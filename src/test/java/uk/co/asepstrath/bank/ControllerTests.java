@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 import javax.sql.DataSource;
 import io.jooby.hikari.HikariModule;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 
 public class ControllerTests extends Jooby {
     {
@@ -36,5 +39,38 @@ public class ControllerTests extends Jooby {
         api.getTransactions();
         var model = controller.getAccTransactions("f38e72e5-16e0-4f53-bce2-5d78e46649c7");
         Assertions.assertNotNull(model);
+    }
+
+    @Test
+    public void testSanctioned() {
+        api.getBusinesses();
+        ArrayList<String> businesses = new ArrayList<>();
+        for (Business b : Businesses.businesses) {
+            if (Businesses.getBusinessByID(b.getId()).isSanctioned()) {
+                businesses.add(Businesses.getBusinessByID(b.getId()).getId());
+            }
+        }
+        Assertions.assertEquals(new ArrayList<>(Arrays.asList("CEX", "HAR", "YAN")), businesses);
+    }
+
+    @Test
+    public void testBigSpenders() {
+        Controller controller = adminSetup();
+        api.getAccounts();
+        api.getTransactions();
+        API.applyTransactions();
+        ArrayList<ArrayList<String>> a = controller.bigSpenders();
+        Assertions.assertNotNull(a);
+    }
+
+
+    @Test
+    public void testReport() {
+        Controller controller = adminSetup();
+        api.getTransactions();
+        api.getBusinesses();
+        API.applyTransactions();
+        ArrayList<ArrayList<String>> a = controller.sanctionReport();
+        Assertions.assertNotNull(a);
     }
 }
