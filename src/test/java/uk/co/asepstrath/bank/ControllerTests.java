@@ -59,7 +59,7 @@ public class ControllerTests extends Jooby {
         api.getAccounts();
         api.getTransactions();
         API.applyTransactions();
-        ArrayList<ArrayList<String>> a = controller.bigSpenders();
+        var a = controller.bigSpenders();
         Assertions.assertNotNull(a);
     }
 
@@ -70,7 +70,7 @@ public class ControllerTests extends Jooby {
         api.getTransactions();
         api.getBusinesses();
         API.applyTransactions();
-        ArrayList<ArrayList<String>> a = controller.sanctionReport();
+        var a = controller.sanctionReport();
         Assertions.assertNotNull(a);
     }
 }
