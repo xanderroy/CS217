@@ -281,7 +281,7 @@ public class Controller {
             ArrayList<ArrayList<String>> list = Businesses.sanctionedBusinesses();
             model.put("sanctions", list);
         } else {
-            model.put("sanctions", new ArrayList<>()); // Empty list if not admin
+            model.put("error", "Forbidden"); // Empty list if not admin
         }
 
         return new ModelAndView("report.hbs", model);
@@ -320,8 +320,8 @@ public class Controller {
             return new ModelAndView("bigSpenders.hbs", model);
         }
         HashMap<String, Object> errorModel = new HashMap<>();
-        errorModel.put("message", "Unauthorized access.");
-        return new ModelAndView("error", errorModel);
+        errorModel.put("error", "Unauthorized access.");
+        return new ModelAndView("bigSpenders.hbs", errorModel);
     }
 
 

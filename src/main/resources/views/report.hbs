@@ -63,26 +63,32 @@
 <body>
 <div class="container">
     <div class="back-button" onclick="history.back()">Go Back</div>
-    <h1>Sanctioned Businesses</h1>
-    {{#if sanctions.length}}
-        <table>
-            <thead>
-            <tr>
-                <th>Business Name</th>
-                <th>Reason</th>
-            </tr>
-            </thead>
-            <tbody>
-            {{#each sanctions}}
-                <tr>
-                    <td>{{this.[0]}}</td>
-                    <td>{{this.[1]}}</td>
-                </tr>
-            {{/each}}
-            </tbody>
-        </table>
+
+    {{#if error}}
+        <p>Forbidden. Please log in.</p>
+
     {{else}}
-        <p class="no-data">No sanctioned businesses found.</p>
+        {{#if sanctions.length}}
+            <h1>Sanctioned Businesses</h1>
+            <table>
+                <thead>
+                <tr>
+                    <th>Transaction</th>
+                    <th>Business Code</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#each sanctions}}
+                    <tr>
+                        <td>{{this.[0]}}</td>
+                        <td>{{this.[1]}}</td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+        {{else}}
+            <p class="no-data">No sanctioned businesses found.</p>
+        {{/if}}
     {{/if}}
 </div>
 </body>

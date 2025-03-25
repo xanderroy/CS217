@@ -60,6 +60,10 @@
 
 <a href="/bank/accounts" class="go-back">Go Back</a>
 
+{{#if error}}
+    <p>Forbidden. Please log in.</p>
+
+{{else}}
 <h1>Big Spenders</h1>
 <table>
     <thead>
@@ -79,5 +83,6 @@
     {{/each}}
     </tbody>
 </table>
+{{/if}}
 </body>
 </html>
