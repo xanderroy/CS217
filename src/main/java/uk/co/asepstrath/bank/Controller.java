@@ -286,6 +286,9 @@ public class Controller {
         if (isAdmin) {
             ArrayList<ArrayList<String>> list = Businesses.sanctionedBusinesses();
             model.put("sanctions", list);
+            HashMap<String, Double> totals = Businesses.sanctionedTotals();
+            System.out.println(totals);
+            model.put("totals", totals);
         } else {
             model.put("error", "Forbidden"); // Empty list if not admin
         }
@@ -296,7 +299,6 @@ public class Controller {
     @GET("/bigspenders")
     public ModelAndView bigSpenders() {
         if (isAdmin) {
-            ArrayList<ArrayList<String>> details = new ArrayList<>();
             double highestSpending;
             String highestSpender = "shut up java";
             ArrayList<String> highestSpenders = new ArrayList<>();

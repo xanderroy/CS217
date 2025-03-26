@@ -68,8 +68,30 @@
         <p>Forbidden. Please log in.</p>
 
     {{else}}
+        {{#if totals}}
+            <h1>Total spending by Business</h1>
+            <table>
+                <thead>
+                <tr>
+                    <th>Business</th>
+                    <th>Total Spending</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#each totals}}
+                    <tr>
+                        <td>{{@key}}</td>
+                        <td>{{this}}</td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+        {{else}}
+            <p>Error in processing businesses.</p>
+        {{/if}}
+
         {{#if sanctions.length}}
-            <h1>Sanctioned Businesses</h1>
+            <h1>Sanctioned Businesses Transaction List</h1>
             <table>
                 <thead>
                 <tr>
