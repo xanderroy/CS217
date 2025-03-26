@@ -71,7 +71,7 @@ public class Controller {
         String userId = ctx.path("id").value();
         Map<String, Object> model = new HashMap<>();
         if(!(currentUserId.equals(userId) || isAdmin)){
-            model.put("error", "Invalid UserID.");
+            model.put("error", "Forbidden. Please log in.");
             return new ModelAndView("userDetails.hbs", model);
         } else {
             try (Connection connection = dataSource.getConnection()) {
@@ -133,7 +133,13 @@ public class Controller {
             while (rs.next()) {
                 Map<String, Object> transaction = new HashMap<>();
                 transaction.put("id", rs.getString("ID"));
-                transaction.put("amount", rs.getDouble("Amount"));
+                if (Accounts.getAccount(id).getRoundUp()) {
+                    transaction.put("amount", Math.ceil(rs.getDouble("Amount")));
+                }
+                else {
+                    transaction.put("amount", rs.getDouble("Amount"));
+
+                }
                 transaction.put("type", rs.getString("Type"));
                 transaction.put("to", rs.getString("To"));
                 transaction.put("from", rs.getString("From"));
