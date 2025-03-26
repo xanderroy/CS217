@@ -36,6 +36,8 @@ public class App extends Jooby {
 
         mvc(new Controller_(ds,log));
 
+        {get("/", ctx -> ctx.sendRedirect("/bank/"));}
+
         /*
         Finally we register our application lifecycle methods
          */
