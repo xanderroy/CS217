@@ -86,6 +86,9 @@ public class Controller {
                         double balance = Accounts.getAccount(userId).getBalance();
                         model.put("balance", balance);
                         model.put("roundup", resultSet.getBoolean("RoundUp"));
+                        if (Accounts.getAccount(userId).getRoundUp()) {
+                            model.put("rounduppot", Accounts.getAccount(userId).getRoundUpsPot());
+                        }
                     } else {
                         model.put("error", "User not found");
                     }
@@ -332,7 +335,16 @@ public class Controller {
         return new ModelAndView("bigSpenders.hbs", errorModel);
     }
 
+    @GET("/{id}/reclaim")
+    public void reclaimRoundups(Context ctx) {
+        String id = ctx.path("id").value();
 
+        if (Objects.equals(currentUserId, id) || isAdmin) {
+            Accounts.getAccount(id).reclaimRoundUps();
+            ctx.sendRedirect("/bank/" + id);
+        }
+
+    }
 
 }
 
