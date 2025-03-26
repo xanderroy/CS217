@@ -80,6 +80,9 @@
     <h2>ScotBank</h2>
     <a href="/bank/{{id}}/transactions">Transactions</a>
     <a href="/bank/{{id}}/summary">Summary</a>
+    {{#if roundup}}
+        <a href="/bank/{{id}}/reclaim">Reclaim Roundups</a>
+    {{/if}}
     <a class="logout" href="/bank/logout">Logout</a>
 </div>
 
@@ -89,6 +92,7 @@
         <p><strong>ID:</strong> {{id}}</p>
         <p><strong>Balance:</strong> £{{balance}}</p>
         <p><strong>Round Up:</strong> {{roundup}}</p>
+        {{#if rounduppot}}<p><strong>Round Ups Pot:</strong {{rounduppot}}></p>{{/if}}
     </div>
 </div>
 

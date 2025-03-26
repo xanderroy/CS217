@@ -57,9 +57,46 @@
         button:hover {
             background-color: #45a049;
         }
+
+        .logout {
+            background-color: red !important;
+        }
+        .sidebar {
+            width: 220px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #388E3C;
+        }
+        .sidebar a:hover {
+            background-color: #2E7D32;
+        }
     </style>
 </head>
 <body>
+
+<div class="sidebar">
+    <h2>ScotBank</h2>
+    <a href="/bank/{{id}}/transactions">Transactions</a>
+    <a href="/bank/{{id}}/summary">Summary</a>
+    {{#if roundup}}
+        <a href="/bank/{{id}}/reclaim">Reclaim Roundups</a>
+    {{/if}}
+    <a class="logout" href="/bank/logout">Logout</a>
+</div>
+
 <div class="container">
     <button onclick="window.history.back()">Go Back</button>
     <h1>User Details</h1>
@@ -71,9 +108,9 @@
             <p><strong>Name:</strong> {{name}}</p>
             <p><strong>Balance:</strong> £{{balance}}</p>
             <p><strong>Round Up:</strong> {{roundup}}</p>
+            {{#if roundup}}<p><strong>Round Ups Pot:</strong> £{{rounduppot}}</p>{{/if}}
         </div>
-        <a href="/bank/{{id}}/transactions">View Transactions</a><br>
-        <a href="/bank/{{id}}/summary">View Summary</a>
+
     {{/if}}
 </div>
 </body>
