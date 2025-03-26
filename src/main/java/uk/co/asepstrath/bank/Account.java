@@ -95,7 +95,7 @@ public class Account {
     }
 
     public double getRoundUpsPot() {
-        return roundUpsPot.doubleValue();
+        return Math.round(roundUpsPot.floatValue()*100)/100.;
     }
 
     public void setRoundUpsPot(double roundUpsPot) {

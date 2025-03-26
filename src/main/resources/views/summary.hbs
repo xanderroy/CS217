@@ -59,6 +59,9 @@
 
 <div class="container">
     <h1>Summary of Spending</h1>
+    {{#if error}}
+        <p>{{error}}</p>
+        {{else}}
     {{#if summary}}
         <div class="summary">
             {{#each summary}}
@@ -67,6 +70,7 @@
         </div>
     {{else}}
         <p>No spending data available.</p>
+    {{/if}}
     {{/if}}
 </div>
 </body>

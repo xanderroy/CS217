@@ -180,7 +180,13 @@ public class API {
                     Accounts.getAccount(t.getTo()).deposit(t.getAmount());
                     break;
                 case "WITHDRAWAL":
-                    Accounts.getAccount(t.getFrom()).withdraw(t.getAmount());
+                    if (Accounts.getAccount(t.getFrom()).getRoundUp()) {
+                        Accounts.getAccount(t.getFrom()).withdraw(Math.ceil(t.getAmount()));
+                        Accounts.getAccount(t.getFrom()).addRoundUps(Math.ceil(t.getAmount()) - t.getAmount());
+                    }
+                    else {
+                        Accounts.getAccount(t.getFrom()).withdraw(t.getAmount());
+                    }
                     break;
                 case "TRANSFER":
                     Accounts.transfer(t.getTo(), t.getFrom(), t.getAmount());
