@@ -37,4 +37,25 @@ public class Businesses {
         }
         return list;
     }
+
+    public static HashMap<String, Double> sanctionedTotals(){
+        HashMap<String, Double> totals = new HashMap<>();
+
+        var sanctionedtrans = Businesses.sanctionedBusinesses();
+
+        for (var t : sanctionedtrans) {
+            String id = t.get(1); //business id
+            String strbalance = t.get(4); //balance
+            double balance = Double.parseDouble(strbalance);
+
+            if (!totals.containsKey(id)) {
+                totals.put(id, balance);
+            }
+            else {
+                totals.put(id, totals.get(id) + balance);
+            }
+        }
+
+        return totals;
+    }
 }
