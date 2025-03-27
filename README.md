@@ -1,14 +1,12 @@
-# Your-Bank
+#CS217 Scotbank
 
-Welcome to your-bank!!
+This was a group project for the class CS217 Agile Software Engineering in Practice done by: 
+-Alexander Roy (me)
+-Haroon Wahid
+-Alexander Croall
+-Holly Higgins
 
-## running
+#Technologies used
 
-    ./mvnw.cmd clean jooby:run
-
-## building
-
-    ./mvnw.cmd clean package
-
-
-i am testing git rights (xander roy). It was I dio (Haroon Wahid). SANDY SUCCESS.  holy gitmoli (Holly Higgins)
+We used Jooby as our main framework with Unirest for communicating the APIs.
+Junit was used for testing, Handlebars was used for frontend.
