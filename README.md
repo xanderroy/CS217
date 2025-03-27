@@ -8,5 +8,8 @@ This was a group project for the class CS217 Agile Software Engineering in Pract
 
 ## Technologies used
 
-We used Jooby as our main framework with Unirest for communicating the APIs.
+We used Jooby as our main framework with Unirest for communicating with the APIs.
+
+Maven was used to build and run the project.
+
 Junit was used for testing, Handlebars was used for frontend.
